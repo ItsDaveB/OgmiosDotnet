@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Corvus.Json.ExtendedTypes" Version="4.0.0-preview.20" />
+  </ItemGroup>
+
 </Project>
