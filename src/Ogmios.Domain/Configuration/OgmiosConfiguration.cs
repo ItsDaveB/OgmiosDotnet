@@ -1,4 +1,4 @@
-namespace Ogmios.Domain.Configuration
+namespace Ogmios.Domain
 {
     public class OgmiosConfiguration
     {

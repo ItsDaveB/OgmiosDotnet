@@ -7,11 +7,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A9B062E5-986
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ogmios.Schema", "src\Schema\Ogmios.Schema.csproj", "{012B91A5-F3D0-4D00-9AC5-493862E568EA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ogmios.Domain", "src\Domain\Ogmios.Domain.csproj", "{8D75C694-9585-405B-8950-51B1FE76CFB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ogmios.Domain", "src\Ogmios.Domain\Ogmios.Domain.csproj", "{8D75C694-9585-405B-8950-51B1FE76CFB4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ogmios.Services", "src\Services\Ogmios.Services.csproj", "{CDC19C00-D002-45AA-9954-7319429BFCBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ogmios.Services", "src\Ogmios.Services\Ogmios.Services.csproj", "{CDC19C00-D002-45AA-9954-7319429BFCBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChainSynchronizationWorker", "src\ChainSynchronization\ChainSynchronizationWorker.csproj", "{AC040E7D-8CDB-42C7-8A49-A6D817B28AAD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ogmios.Tests", "src\Ogmios.Tests\Ogmios.Tests.csproj", "{160115BF-DFC0-4B88-86B7-B9CE0AA4C2FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ogmios.Example.Worker", "src\Ogmios.Example.Worker\ChainSynchronizationWorker.csproj", "{AC040E7D-8CDB-42C7-8A49-A6D817B28AAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{012B91A5-F3D0-4D00-9AC5-493862E568EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{012B91A5-F3D0-4D00-9AC5-493862E568EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{012B91A5-F3D0-4D00-9AC5-493862E568EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{160115BF-DFC0-4B88-86B7-B9CE0AA4C2FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{160115BF-DFC0-4B88-86B7-B9CE0AA4C2FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{160115BF-DFC0-4B88-86B7-B9CE0AA4C2FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{160115BF-DFC0-4B88-86B7-B9CE0AA4C2FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,6 +50,7 @@ Global
 		{CDC19C00-D002-45AA-9954-7319429BFCBB} = {A9B062E5-986A-4238-89D1-7922E43319A0}
 		{AC040E7D-8CDB-42C7-8A49-A6D817B28AAD} = {A9B062E5-986A-4238-89D1-7922E43319A0}
 		{012B91A5-F3D0-4D00-9AC5-493862E568EA} = {A9B062E5-986A-4238-89D1-7922E43319A0}
+		{160115BF-DFC0-4B88-86B7-B9CE0AA4C2FB} = {A9B062E5-986A-4238-89D1-7922E43319A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2277F8FE-3D3A-42F3-BC63-FDD0EF2D64CB}

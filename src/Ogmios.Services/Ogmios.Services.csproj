@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>Ogmios.Domain</RootNamespace>
+    <RootNamespace>Ogmios.Services</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain\Ogmios.Domain.csproj" />
+    <ProjectReference Include="..\Ogmios.Domain\Ogmios.Domain.csproj" />
     <ProjectReference Include="..\Schema\Ogmios.Schema.csproj" />
   </ItemGroup>
 

@@ -1,10 +1,9 @@
 using System.Net.WebSockets;
 using System.Text.Json;
-using Ogmios.Services.InteractionContext;
 using Corvus.Json;
 using Generated;
 
-namespace Ogmios.Domain.ChainSynchronization;
+namespace Ogmios.Services.ChainSynchronization;
 
 public class BlockService
 {
@@ -29,7 +28,7 @@ public class BlockService
         public string? Id { get; set; }
     }
 
-    public async Task GetNextBlockAsync(InteractionContext context, MirrorOptions? options = null)
+    public async Task GetNextBlockAsync(Domain.InteractionContext context, MirrorOptions? options = null)
     {
         var request = new
         {

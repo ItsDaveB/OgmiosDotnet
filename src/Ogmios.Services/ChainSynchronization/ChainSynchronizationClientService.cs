@@ -1,11 +1,9 @@
 using System.Net.WebSockets;
 using System.Text;
-using Ogmios.Services.InteractionContext;
-using static Ogmios.Domain.ChainSynchronization.BlockService;
 using System.Collections.Concurrent;
-using Ogmios.Domain.Configuration;
+using static Ogmios.Services.ChainSynchronization.BlockService;
 
-namespace Ogmios.Domain.ChainSynchronization
+namespace Ogmios.Services.ChainSynchronization
 {
     public class ChainSynchronizationClientService(IChainSynchronizationMessageHandlers messageHandlers, IIntersectionService intersectionService, BlockService blockService) : IChainSynchronizationClientService
     {

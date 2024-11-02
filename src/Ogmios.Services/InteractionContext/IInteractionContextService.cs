@@ -1,5 +1,4 @@
 using System.Net.WebSockets;
-using Ogmios.Domain.Configuration;
 using Ogmios.Domain;
 
 namespace Ogmios.Services.InteractionContext;

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Configuration;
-using Ogmios.Domain.Configuration;
+using Ogmios.Domain;
 
 namespace Ogmios.Services.InteractionContext;
 
@@ -7,7 +7,7 @@ public class InteractionContextFactory(IConfiguration configuration) : IInteract
 {
     private readonly IConfiguration _configuration = configuration;
 
-    public async Task<InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint)
+    public async Task<Domain.InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint)
     {
         var ogmiosConfiguration = _configuration.GetSection("Ogmios").Get<OgmiosConfiguration>();
 

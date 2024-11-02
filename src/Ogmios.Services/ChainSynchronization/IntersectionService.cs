@@ -3,15 +3,14 @@ using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Corvus.Json;
-using Ogmios.Domain.Configuration;
-using Ogmios.Services.InteractionContext;
-using static Ogmios.Domain.ChainSynchronization.BlockService;
+using Ogmios.Domain;
+using static Ogmios.Services.ChainSynchronization.BlockService;
 
-namespace Ogmios.Domain.ChainSynchronization;
+namespace Ogmios.Services.ChainSynchronization;
 
 public class IntersectionService : IIntersectionService
 {
-    public async Task<Generated.Ogmios.FindIntersectionResponseEntity.IntersectionFound> FindIntersectionAsync(InteractionContext context, IEnumerable<StartingPointConfiguration> points, MirrorOptions? options = null)
+    public async Task<Generated.Ogmios.FindIntersectionResponseEntity.IntersectionFound> FindIntersectionAsync(Domain.InteractionContext context, IEnumerable<StartingPointConfiguration> points, MirrorOptions? options = null)
     {
         var pointItems = points?.Select(x => new
         {
