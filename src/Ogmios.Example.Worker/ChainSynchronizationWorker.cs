@@ -1,3 +1,4 @@
+using Ogmios.Domain;
 using Ogmios.Services.ChainSynchronization;
 using Ogmios.Services.InteractionContext;
 
@@ -16,27 +17,28 @@ namespace Ogmios.Example.Worker
 
             try
             {
-                var contexts = new List<Ogmios.Domain.InteractionContext>();
-                var startingPoints = _configuration.GetSection("StartingPoints").Get<List<Domain.StartingPointConfiguration>>();
+                var contexts = new List<InteractionContext>();
+                var startingPoints = _configuration.GetSection("StartingPoints").Get<List<StartingPointConfiguration>>();
+                var ogmiosConfiguration = _configuration.GetSection("Ogmios").Get<OgmiosConfiguration>() ?? throw new Exception("Ogmios Configuration not found.");
 
                 for (int i = 0; i < startingPoints?.Count; i++)
                 {
                     var startingPoint = startingPoints[i];
                     var connectionName = $"connection_{i}";
-                    var context = await _contextFactory.CreateInteractionContextAsync(connectionName, startingPoint);
+                    var context = await _contextFactory.CreateInteractionContextAsync(connectionName, startingPoint, ogmiosConfiguration);
                     contexts.Add(context);
                 }
 
-                var points = await _chainSynchronizationClientService.ResumeAsync(contexts, 100, stoppingToken);
+                var points = await _chainSynchronizationClientService.ResumeAsync(contexts, maxBlocksPerSecond: ogmiosConfiguration.MaxBlocksPerSecond, inFlight: 100, stoppingToken);
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     await Task.Delay(100, stoppingToken);
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                _logger.LogInformation("Worker cancellation requested.");
+                _logger.LogInformation($"Worker cancellation requested. {ex.Message}");
             }
             catch (Exception ex)
             {

@@ -8,15 +8,16 @@ namespace Ogmios.Services.ChainSynchronization
 {
     public class ChainSynchronizationClientService(IChainSynchronizationMessageHandlers messageHandlers, IIntersectionService intersectionService, IBlockService blockService) : IChainSynchronizationClientService
     {
-        public readonly BlockingCollection<(string, Domain.InteractionContext)> MessageQueue = [];
+        public readonly BlockingCollection<(string, Domain.InteractionContext)> MessageQueue = new(boundedCapacity: 1000);
         private readonly IChainSynchronizationMessageHandlers _messageHandlers = messageHandlers ?? throw new ArgumentNullException(nameof(messageHandlers));
         private readonly IIntersectionService _intersectionService = intersectionService ?? throw new ArgumentNullException(nameof(intersectionService));
         private readonly IBlockService _blockService = blockService ?? throw new ArgumentNullException(nameof(blockService));
         private readonly Dictionary<Guid, DateTime> _requestTimestamps = [];
+        private readonly SemaphoreSlim _rateLimiter = new(1, 1);
 
         public async Task ResumeListeningAsync(Domain.InteractionContext interactionContext, CancellationToken cancellationToken)
         {
-            var buffer = new byte[1024]; // 8 KB buffer size for WebSocket messages
+            var buffer = new byte[8192]; // 8 KB buffer size for WebSocket messages
             var messageBuilder = new StringBuilder();
 
             while (!cancellationToken.IsCancellationRequested && interactionContext.Socket.State == WebSocketState.Open)
@@ -53,18 +54,31 @@ namespace Ogmios.Services.ChainSynchronization
             }
         }
 
-        public async Task ProcessMessagesAsync(CancellationToken cancellationToken)
+        public async Task ProcessMessagesAsync(int maxBlocksPerSecond, CancellationToken cancellationToken)
         {
+            var timeWindow = TimeSpan.FromSeconds(1.0 / maxBlocksPerSecond);
+
             try
             {
                 foreach (var item in MessageQueue.GetConsumingEnumerable(cancellationToken))
                 {
                     var (message, context) = item;
+                    await _rateLimiter.WaitAsync(cancellationToken);
 
-                    await ProcessBlockMessageAsync(message);
-                    await RequestNextBlockAsync(context);
+                    try
+                    {
+
+                        await ProcessBlockMessageAsync(message);
+                        await RequestNextBlockAsync(context);
+                    }
+                    finally
+                    {
+                        await Task.Delay(timeWindow, cancellationToken);
+                        _rateLimiter.Release();
+                    }
                 }
             }
+
             catch (OperationCanceledException)
             {
                 Console.WriteLine("Processing cancelled.");
@@ -87,14 +101,14 @@ namespace Ogmios.Services.ChainSynchronization
             }
         }
 
-        public async Task<List<StartingPointConfiguration>> ResumeAsync(List<Domain.InteractionContext> interactionContexts, int inFlight = 100, CancellationToken cancellationToken = default)
+        public async Task<List<StartingPointConfiguration>> ResumeAsync(List<Domain.InteractionContext> interactionContexts, int maxBlocksPerSecond, int inFlight = 100, CancellationToken cancellationToken = default)
         {
             foreach (var context in interactionContexts)
             {
                 await CreatePointFromCurrentTipAsync(context, context.StartingPoint).ConfigureAwait(false);
             }
 
-            _ = Task.Run(() => ProcessMessagesAsync(cancellationToken), cancellationToken);
+            _ = Task.Run(() => ProcessMessagesAsync(maxBlocksPerSecond, cancellationToken), cancellationToken);
 
             foreach (var context in interactionContexts)
             {

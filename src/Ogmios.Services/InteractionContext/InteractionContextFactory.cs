@@ -1,17 +1,12 @@
-using Microsoft.Extensions.Configuration;
 using Ogmios.Domain;
 using Ogmios.Services.ChainSynchronization;
 
 namespace Ogmios.Services.InteractionContext;
 
-public class InteractionContextFactory(IConfiguration configuration, IWebSocketService webSocketService) : IInteractionContextFactory
+public class InteractionContextFactory(IWebSocketService webSocketService) : IInteractionContextFactory
 {
-    private readonly IConfiguration _configuration = configuration;
-
-    public Task<Domain.InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint)
+    public Task<Domain.InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint, OgmiosConfiguration ogmiosConfiguration)
     {
-        var ogmiosConfiguration = _configuration.GetSection("Ogmios").Get<OgmiosConfiguration>();
-
         if (string.IsNullOrWhiteSpace(ogmiosConfiguration?.Host))
         {
             throw new ArgumentException("OgmiosHost configuration is missing or empty.");

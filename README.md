@@ -9,7 +9,7 @@
 To use **OgmiosDotnetClient**, you need:
 
 - A Cardano Node running Ogmios, or
-- Access to an Ogmios service, such as [Demeter](https://demeter.run), which provides instant access to Ogmios with a free tier sponsored by the Cardano Foundation.
+- Access to an Ogmios service, such as [Demeter](https://demeter.run), which provides instant access to Ogmios with a free tier sponsored by the Cardano Foundation. (I recommend this optio due to ease of use, flexibility & it's backed by a great team ensuring stability and responsiveness.)
 
 ## Integration Steps
 

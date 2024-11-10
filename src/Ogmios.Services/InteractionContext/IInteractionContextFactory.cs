@@ -5,5 +5,5 @@ namespace Ogmios.Services.InteractionContext;
 
 public interface IInteractionContextFactory
 {
-    Task<Domain.InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint);
+    Task<Domain.InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint, OgmiosConfiguration ogmiosConfiguration);
 }

@@ -6,7 +6,7 @@ namespace Ogmios.Services.ChainSynchronization;
 
 public class WebSocketService : IWebSocketService
 {
-    private const int BufferSize = 4096;
+    private const int BufferSize = 8192;
 
     public async Task<IClientWebSocket> ConnectAsync(Uri addressWebSocket, ConnectionConfig connectionConfig, CancellationToken cancellationToken = default)
     {
@@ -61,10 +61,7 @@ public class WebSocketService : IWebSocketService
 
     public async Task<string> SendAndWaitForResponseAsync(string message, IClientWebSocket clientWebSocket, int timeoutMilliseconds = 5000, CancellationToken cancellationToken = default)
     {
-        var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        cts.CancelAfter(timeoutMilliseconds);
-
-        await SendMessageAsync(message, clientWebSocket, cts.Token);
-        return await ReceiveMessageAsync(clientWebSocket, cts.Token);
+        await SendMessageAsync(message, clientWebSocket, cancellationToken);
+        return await ReceiveMessageAsync(clientWebSocket, cancellationToken);
     }
 }

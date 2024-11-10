@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Corvus.Json;
 
 namespace Ogmios.Services.ChainSynchronization;
@@ -13,10 +12,10 @@ public class BlockService(IWebSocketService webSocketService) : IBlockService
         public string? Id { get; set; }
     }
 
-    public async Task GetNextBlockAsync(Domain.InteractionContext context, MirrorOptions? options = null)
+    public Task GetNextBlockAsync(Domain.InteractionContext context, MirrorOptions? options = null)
     {
         var nextBlockRequest = Generated.Ogmios.NextBlock.Create(jsonrpc: Generated.Ogmios.NextBlock.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.NextBlock.MethodEntity.EnumValues.NextBlock, id: options?.Id ?? string.Empty);
-        await webSocketService.SendMessageAsync(nextBlockRequest.AsJsonElement.ToString(), context.Socket);
+        return webSocketService.SendMessageAsync(nextBlockRequest.AsJsonElement.ToString(), context.Socket);
     }
 
     public async Task HandleNextBlockAsync(string response, IChainSynchronizationMessageHandlers messageHandlers)
@@ -32,7 +31,6 @@ public class BlockService(IWebSocketService webSocketService) : IBlockService
         switch ((string)direction.AsString)
         {
             case "backward":
-                Console.WriteLine("Rolling backwards.");
                 var rollBackward = result.Instance.Result.AsRollBackward;
                 await messageHandlers.RollBackwardHandler(rollBackward.Point, rollBackward.Tip);
                 break;
@@ -45,8 +43,6 @@ public class BlockService(IWebSocketService webSocketService) : IBlockService
                     var blocktype = (string)type.AsString ?? "Unknown type";
 
                     Console.WriteLine($"Processed block height: {blockheight}");
-                    Console.WriteLine("Rolling forwards.");
-
                     await messageHandlers.RollForwardHandler(block, blocktype, result.Instance.Result.AsRollForward.Tip);
                 }
                 break;

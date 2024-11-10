@@ -4,5 +4,6 @@ namespace Ogmios.Domain
     {
         public required string StartingPointIdOrOrigin { get; set; } = "origin";
         public long StartingPointSlot { get; set; }
+        public int MaxBlocksPerSecond { get; set; }
     }
 }
