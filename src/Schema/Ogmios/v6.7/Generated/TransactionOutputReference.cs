@@ -63,7 +63,7 @@ public readonly partial struct TransactionOutputReference
     /// <summary>
     /// Gets the schema location from which this type was generated.
     /// </summary>
-    public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/TransactionOutputReference";
+    public static string SchemaLocation { get; } = "Ogmios/Generated/cardano.json#/definitions/TransactionOutputReference";
 
     /// <summary>
     /// Gets a Null instance.

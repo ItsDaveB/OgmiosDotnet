@@ -67,7 +67,7 @@ public readonly partial struct VerificationKey
     /// <summary>
     /// Gets the schema location from which this type was generated.
     /// </summary>
-    public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/VerificationKey";
+    public static string SchemaLocation { get; } = "Ogmios/Generated/cardano.json#/definitions/VerificationKey";
 
     /// <summary>
     /// Gets a Null instance.

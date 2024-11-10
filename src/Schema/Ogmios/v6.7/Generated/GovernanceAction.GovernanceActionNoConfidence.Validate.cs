@@ -42,7 +42,7 @@ public readonly partial struct GovernanceAction
             if (level > ValidationLevel.Basic)
             {
                 result = result.UsingStack();
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/GovernanceAction/oneOf/6");
+                result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/GovernanceAction/oneOf/6");
             }
 
             JsonValueKind valueKind = this.ValueKind;

@@ -42,7 +42,7 @@ public readonly partial struct GenesisShelley
             if (level > ValidationLevel.Basic)
             {
                 result = result.UsingStack();
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Genesis<Shelley>/properties/era");
+                result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/Genesis<Shelley>/properties/era");
             }
 
             JsonValueKind valueKind = this.ValueKind;

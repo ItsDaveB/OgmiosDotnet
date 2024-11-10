@@ -75,7 +75,7 @@ public readonly partial struct DigestBlake2b256
     /// <summary>
     /// Gets the schema location from which this type was generated.
     /// </summary>
-    public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Digest<Blake2b, 256>";
+    public static string SchemaLocation { get; } = "Ogmios/Generated/cardano.json#/definitions/Digest<Blake2b, 256>";
 
     /// <summary>
     /// Gets a Null instance.

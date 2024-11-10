@@ -37,7 +37,7 @@ public readonly partial struct RedeemerPointer
             if (level > ValidationLevel.Basic)
             {
                 result = result.UsingStack();
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/RedeemerPointer/properties/purpose");
+                result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/RedeemerPointer/properties/purpose");
             }
 
             JsonValueKind valueKind = this.ValueKind;

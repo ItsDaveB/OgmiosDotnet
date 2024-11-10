@@ -2,18 +2,19 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Collections.Concurrent;
 using static Ogmios.Services.ChainSynchronization.BlockService;
+using Ogmios.Domain;
 
 namespace Ogmios.Services.ChainSynchronization
 {
-    public class ChainSynchronizationClientService(IChainSynchronizationMessageHandlers messageHandlers, IIntersectionService intersectionService, BlockService blockService) : IChainSynchronizationClientService
+    public class ChainSynchronizationClientService(IChainSynchronizationMessageHandlers messageHandlers, IIntersectionService intersectionService, IBlockService blockService) : IChainSynchronizationClientService
     {
+        public readonly BlockingCollection<(string, Domain.InteractionContext)> MessageQueue = [];
         private readonly IChainSynchronizationMessageHandlers _messageHandlers = messageHandlers ?? throw new ArgumentNullException(nameof(messageHandlers));
         private readonly IIntersectionService _intersectionService = intersectionService ?? throw new ArgumentNullException(nameof(intersectionService));
-        private readonly BlockService _blockService = blockService ?? throw new ArgumentNullException(nameof(blockService));
+        private readonly IBlockService _blockService = blockService ?? throw new ArgumentNullException(nameof(blockService));
         private readonly Dictionary<Guid, DateTime> _requestTimestamps = [];
-        private readonly BlockingCollection<(string, InteractionContext)> _messageQueue = [];
 
-        public async Task ResumeListeningAsync(InteractionContext interactionContext, CancellationToken cancellationToken)
+        public async Task ResumeListeningAsync(Domain.InteractionContext interactionContext, CancellationToken cancellationToken)
         {
             var buffer = new byte[1024]; // 8 KB buffer size for WebSocket messages
             var messageBuilder = new StringBuilder();
@@ -31,18 +32,19 @@ namespace Ogmios.Services.ChainSynchronization
                         if (result.EndOfMessage)
                         {
                             var message = messageBuilder.ToString();
-                            _messageQueue.Add((message, interactionContext), cancellationToken);
+                            MessageQueue.Add((message, interactionContext), cancellationToken);
                             messageBuilder.Clear();
                         }
                     }
                     else if (result.MessageType == WebSocketMessageType.Close)
                     {
                         await ShutdownAsync(interactionContext).ConfigureAwait(false);
+                        break;
                     }
                 }
-                catch (WebSocketException wsEx)
+                catch (WebSocketException webSocketException)
                 {
-                    Console.WriteLine($"WebSocket error: {wsEx.Message}");
+                    Console.WriteLine($"WebSocket error: {webSocketException.Message}");
                 }
                 catch (Exception ex)
                 {
@@ -50,11 +52,12 @@ namespace Ogmios.Services.ChainSynchronization
                 }
             }
         }
-        private async Task ProcessMessagesAsync(CancellationToken cancellationToken)
+
+        public async Task ProcessMessagesAsync(CancellationToken cancellationToken)
         {
             try
             {
-                foreach (var item in _messageQueue.GetConsumingEnumerable(cancellationToken))
+                foreach (var item in MessageQueue.GetConsumingEnumerable(cancellationToken))
                 {
                     var (message, context) = item;
 
@@ -84,11 +87,11 @@ namespace Ogmios.Services.ChainSynchronization
             }
         }
 
-        public async Task<List<StartingPointConfiguration>> ResumeAsync(List<InteractionContext> interactionContexts, int inFlight = 100, CancellationToken cancellationToken = default)
+        public async Task<List<StartingPointConfiguration>> ResumeAsync(List<Domain.InteractionContext> interactionContexts, int inFlight = 100, CancellationToken cancellationToken = default)
         {
             foreach (var context in interactionContexts)
             {
-                await CreatePointFromCurrentTipAsync(context, [context.StartingPoint]).ConfigureAwait(false);
+                await CreatePointFromCurrentTipAsync(context, context.StartingPoint).ConfigureAwait(false);
             }
 
             _ = Task.Run(() => ProcessMessagesAsync(cancellationToken), cancellationToken);
@@ -109,7 +112,7 @@ namespace Ogmios.Services.ChainSynchronization
             return interactionContexts.Select(x => x.StartingPoint).ToList();
         }
 
-        private async Task RequestNextBlockAsync(InteractionContext interactionContext)
+        private async Task RequestNextBlockAsync(Domain.InteractionContext interactionContext)
         {
             try
             {
@@ -124,7 +127,7 @@ namespace Ogmios.Services.ChainSynchronization
             }
         }
 
-        public async Task ShutdownAsync(InteractionContext interactionContext)
+        public async Task ShutdownAsync(Domain.InteractionContext interactionContext)
         {
             if (interactionContext.Socket.State == WebSocketState.Open)
             {
@@ -132,11 +135,11 @@ namespace Ogmios.Services.ChainSynchronization
             }
         }
 
-        public async Task<Generated.Ogmios.TipOrOrigin> CreatePointFromCurrentTipAsync(InteractionContext context, IEnumerable<StartingPointConfiguration> startingPoints)
+        public async Task<Generated.Ogmios.TipOrOrigin> CreatePointFromCurrentTipAsync(Domain.InteractionContext context, StartingPointConfiguration startingPoint)
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            var intersection = await _intersectionService.FindIntersectionAsync(context, startingPoints).ConfigureAwait(false);
+            var intersection = await _intersectionService.FindIntersectionAsync(context, startingPoint).ConfigureAwait(false);
             var tip = intersection.Result.Tip.AsTip;
 
             return tip;

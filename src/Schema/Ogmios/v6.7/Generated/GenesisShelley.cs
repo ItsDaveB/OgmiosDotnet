@@ -68,7 +68,7 @@ public readonly partial struct GenesisShelley
     /// <summary>
     /// Gets the schema location from which this type was generated.
     /// </summary>
-    public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Genesis<Shelley>";
+    public static string SchemaLocation { get; } = "Ogmios/Generated/cardano.json#/definitions/Genesis<Shelley>";
 
     /// <summary>
     /// Gets a Null instance.

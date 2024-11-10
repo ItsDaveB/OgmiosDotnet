@@ -62,7 +62,7 @@ public readonly partial struct Ogmios
                             if (level > ValidationLevel.Basic)
                             {
                                 result = result.UsingStack();
-                                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/ogmios.json#/definitions/SubmitTransactionFailure/oneOf/25/properties/data/oneOf/3/properties/discriminatedType");
+                                result = result.PushSchemaLocation("Ogmios/Generated/ogmios.json#/definitions/SubmitTransactionFailure/oneOf/25/properties/data/oneOf/3/properties/discriminatedType");
                             }
 
                             JsonValueKind valueKind = this.ValueKind;

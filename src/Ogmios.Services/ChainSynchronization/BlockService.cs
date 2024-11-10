@@ -1,25 +1,10 @@
-using System.Net.WebSockets;
 using System.Text.Json;
 using Corvus.Json;
-using Generated;
 
 namespace Ogmios.Services.ChainSynchronization;
 
-public class BlockService
+public class BlockService(IWebSocketService webSocketService) : IBlockService
 {
-    private readonly BaseRequest baseRequest = new();
-    public interface IChainSynchronizationMessageHandlers
-    {
-        Task RollBackwardHandler(Generated.Ogmios.PointOrOrigin point, Generated.Ogmios.TipOrOrigin tip);
-
-        Task RollForwardHandler(Block block, string blockType, Tip tip);
-    }
-
-    public class BaseRequest
-    {
-        public string JsonRpc { get; set; } = "2.0";
-    }
-
     public class MirrorOptions
     {
         /// <summary>
@@ -30,58 +15,45 @@ public class BlockService
 
     public async Task GetNextBlockAsync(Domain.InteractionContext context, MirrorOptions? options = null)
     {
-        var request = new
-        {
-            jsonrpc = baseRequest.JsonRpc,
-            method = "nextBlock",
-            id = options?.Id ?? string.Empty
-        };
-
-        string jsonRequest = JsonSerializer.Serialize(request);
-        Console.WriteLine($"NextBlock {context.ConnectionName}");
-
-        await SendMessageAsync(context.Socket, jsonRequest);
+        var nextBlockRequest = Generated.Ogmios.NextBlock.Create(jsonrpc: Generated.Ogmios.NextBlock.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.NextBlock.MethodEntity.EnumValues.NextBlock, id: options?.Id ?? string.Empty);
+        await webSocketService.SendMessageAsync(nextBlockRequest.AsJsonElement.ToString(), context.Socket);
     }
-
 
     public async Task HandleNextBlockAsync(string response, IChainSynchronizationMessageHandlers messageHandlers)
     {
-        if (response is null)
+        if (string.IsNullOrEmpty(response))
         {
             return;
         }
 
         var result = ParsedValue<Generated.Ogmios.NextBlockResponse>.Parse(response);
-
         result.Instance.Result.TryGetProperty("direction", out var direction);
-        result.Instance.Result.AsRollForward.Block.TryGetProperty("height", out var height);
-        var blockheight = (int)height.AsNumber;
-        Console.WriteLine($"Processed block height: {blockheight}");
 
         switch ((string)direction.AsString)
         {
             case "backward":
-                Console.WriteLine($"rolling backwards.");
+                Console.WriteLine("Rolling backwards.");
                 var rollBackward = result.Instance.Result.AsRollBackward;
                 await messageHandlers.RollBackwardHandler(rollBackward.Point, rollBackward.Tip);
                 break;
+
             case "forward":
-                Console.WriteLine($"rolling forwards.");
-                var rollForward = result.Instance.Result.AsRollForward;
-                rollForward.Block.TryGetProperty("type", out var blocktype);
-                await messageHandlers.RollForwardHandler(rollForward.Block, (string)blocktype.AsString, rollForward.Tip);
+                var block = result.Instance.Result.AsRollForward.Block;
+                if (block.HasProperty("height") && block.TryGetProperty("height", out var height) && block.HasProperty("type") && block.TryGetProperty("type", out var type))
+                {
+                    var blockheight = (long)height.AsNumber;
+                    var blocktype = (string)type.AsString ?? "Unknown type";
+
+                    Console.WriteLine($"Processed block height: {blockheight}");
+                    Console.WriteLine("Rolling forwards.");
+
+                    await messageHandlers.RollForwardHandler(block, blocktype, result.Instance.Result.AsRollForward.Tip);
+                }
                 break;
+
             default:
+                Console.WriteLine("Unknown direction or unsupported block direction.");
                 break;
         }
-
-    }
-
-    private Task SendMessageAsync(ClientWebSocket socket, string message)
-    {
-        var buffer = System.Text.Encoding.UTF8.GetBytes(message);
-        var segment = new ArraySegment<byte>(buffer);
-
-        return socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
     }
 }

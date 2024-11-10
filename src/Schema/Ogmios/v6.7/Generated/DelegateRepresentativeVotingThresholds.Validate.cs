@@ -31,7 +31,7 @@ public readonly partial struct DelegateRepresentativeVotingThresholds
         if (level > ValidationLevel.Basic)
         {
             result = result.UsingStack();
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/DelegateRepresentativeVotingThresholds");
+            result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/DelegateRepresentativeVotingThresholds");
         }
 
         JsonValueKind valueKind = this.ValueKind;

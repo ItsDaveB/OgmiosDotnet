@@ -37,7 +37,7 @@ public readonly partial struct StakePoolVotingThresholds
             if (level > ValidationLevel.Basic)
             {
                 result = result.UsingStack();
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/StakePoolVotingThresholds/properties/protocolParametersUpdate");
+                result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/StakePoolVotingThresholds/properties/protocolParametersUpdate");
             }
 
             JsonValueKind valueKind = this.ValueKind;

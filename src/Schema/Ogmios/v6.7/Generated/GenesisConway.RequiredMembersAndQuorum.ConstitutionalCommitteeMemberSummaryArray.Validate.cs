@@ -47,7 +47,7 @@ public readonly partial struct GenesisConway
                 if (level > ValidationLevel.Basic)
                 {
                     result = result.UsingStack();
-                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Genesis<Conway>/properties/constitutionalCommittee/properties/members");
+                    result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/Genesis<Conway>/properties/constitutionalCommittee/properties/members");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;

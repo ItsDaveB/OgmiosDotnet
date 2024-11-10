@@ -37,7 +37,7 @@ public readonly partial struct Ogmios
             if (level > ValidationLevel.Basic)
             {
                 result = result.UsingStack();
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/ogmios.json#/properties/AcquireLedgerStateFailure");
+                result = result.PushSchemaLocation("Ogmios/Generated/ogmios.json#/properties/AcquireLedgerStateFailure");
             }
 
             JsonValueKind valueKind = this.ValueKind;

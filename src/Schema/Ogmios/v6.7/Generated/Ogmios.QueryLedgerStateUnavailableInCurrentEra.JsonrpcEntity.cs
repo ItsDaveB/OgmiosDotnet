@@ -73,7 +73,7 @@ public readonly partial struct Ogmios
             /// <summary>
             /// Gets the schema location from which this type was generated.
             /// </summary>
-            public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/ogmios.json#/properties/QueryLedgerStateUnavailableInCurrentEra/properties/jsonrpc";
+            public static string SchemaLocation { get; } = "Ogmios/Generated/ogmios.json#/properties/QueryLedgerStateUnavailableInCurrentEra/properties/jsonrpc";
 
             /// <summary>
             /// Gets a Null instance.

@@ -31,7 +31,7 @@ public readonly partial struct CredentialOrigin
         if (level > ValidationLevel.Basic)
         {
             result = result.UsingStack();
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/CredentialOrigin");
+            result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/CredentialOrigin");
         }
 
         JsonValueKind valueKind = this.ValueKind;

@@ -36,7 +36,7 @@ public readonly partial struct OperationalCertificate
         if (level > ValidationLevel.Basic)
         {
             result = result.UsingStack();
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/OperationalCertificate");
+            result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/OperationalCertificate");
         }
 
         JsonValueKind valueKind = this.ValueKind;

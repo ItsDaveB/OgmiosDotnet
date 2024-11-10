@@ -44,7 +44,7 @@ public readonly partial struct DigestBlake2b256
         if (level > ValidationLevel.Basic)
         {
             result = result.UsingStack();
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Digest<Blake2b, 256>");
+            result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/Digest<Blake2b, 256>");
         }
 
         JsonValueKind valueKind = this.ValueKind;

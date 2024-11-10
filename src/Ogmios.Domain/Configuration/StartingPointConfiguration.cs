@@ -2,7 +2,7 @@ namespace Ogmios.Domain
 {
     public class StartingPointConfiguration
     {
-        public required string StartingId { get; set; }
-        public long StartingSlot { get; set; }
+        public required string StartingPointIdOrOrigin { get; set; } = "origin";
+        public long StartingPointSlot { get; set; }
     }
 }

@@ -1,13 +1,14 @@
 using Microsoft.Extensions.Configuration;
 using Ogmios.Domain;
+using Ogmios.Services.ChainSynchronization;
 
 namespace Ogmios.Services.InteractionContext;
 
-public class InteractionContextFactory(IConfiguration configuration) : IInteractionContextFactory
+public class InteractionContextFactory(IConfiguration configuration, IWebSocketService webSocketService) : IInteractionContextFactory
 {
     private readonly IConfiguration _configuration = configuration;
 
-    public async Task<Domain.InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint)
+    public Task<Domain.InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint)
     {
         var ogmiosConfiguration = _configuration.GetSection("Ogmios").Get<OgmiosConfiguration>();
 
@@ -18,20 +19,8 @@ public class InteractionContextFactory(IConfiguration configuration) : IInteract
 
         var config = new ConnectionConfig { Host = ogmiosConfiguration.Host, Port = ogmiosConfiguration.Port };
 
-        var service = new InteractionContextService();
+        var service = new InteractionContextService(webSocketService);
 
-        return await service.CreateInteractionContextAsync(connectionName, startingPoint,
-            err =>
-            {
-                Console.Error.WriteLine(err);
-                return Task.CompletedTask;
-            },
-            (status, reason) =>
-            {
-                Console.WriteLine("Connection closed.");
-                return Task.CompletedTask;
-            },
-            config
-        );
+        return service.CreateInteractionContextAsync(connectionName, startingPoint, config);
     }
 }

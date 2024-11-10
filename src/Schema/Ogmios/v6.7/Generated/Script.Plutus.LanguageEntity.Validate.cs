@@ -42,7 +42,7 @@ public readonly partial struct Script
                 if (level > ValidationLevel.Basic)
                 {
                     result = result.UsingStack();
-                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Script/oneOf/1/properties/language");
+                    result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/Script/oneOf/1/properties/language");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;

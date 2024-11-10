@@ -1,14 +1,12 @@
-using System.Net.WebSockets;
 using Ogmios.Domain;
+using Ogmios.Services.ChainSynchronization;
 
 namespace Ogmios.Services.InteractionContext;
 
-public class InteractionContextService : IInteractionContextService
+public class InteractionContextService(IWebSocketService webSocketService) : IInteractionContextService
 {
-    public Connection CreateConnectionObject(ConnectionConfig? config = null)
+    public Connection CreateConnectionObject(ConnectionConfig config)
     {
-        config ??= new ConnectionConfig();
-
         var host = config.Host.Replace("https://", "").Replace("http://", "")
                               .Replace("wss://", "").Replace("ws://", "");
 
@@ -30,9 +28,9 @@ public class InteractionContextService : IInteractionContextService
         };
     }
 
-    public async Task<Domain.InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint, Func<Exception, Task> errorHandler, Func<WebSocketCloseStatus, string, Task> closeHandler, ConnectionConfig? config = null)
+    public async Task<Domain.InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint, ConnectionConfig connectionConfiguration)
     {
-        var connection = CreateConnectionObject(config);
+        var connection = CreateConnectionObject(connectionConfiguration);
         // var health = await GetServerHealthAsync(connection);
 
         // if (health.LastTipUpdate == null)
@@ -40,26 +38,22 @@ public class InteractionContextService : IInteractionContextService
         //     throw new Exception("Server not ready.");
         // }
 
-        var socket = new ClientWebSocket();
-        socket.Options.KeepAliveInterval = TimeSpan.FromSeconds(config?.KeepAliveInterval ?? 60);
-        socket.Options.SetBuffer(connection.MaxPayload, connection.MaxPayload);
-
         try
         {
-            await socket.ConnectAsync(connection.AddressWebSocket, CancellationToken.None);
+
+            var socket = await webSocketService.ConnectAsync(connection.AddressWebSocket, connectionConfiguration, CancellationToken.None);
+
+            return new Domain.InteractionContext
+            {
+                StartingPoint = startingPoint,
+                ConnectionName = connectionName,
+                Connection = connection,
+                Socket = socket
+            };
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            await errorHandler(ex);
             throw;
         }
-
-        return new Domain.InteractionContext
-        {
-            StartingPoint = startingPoint,
-            ConnectionName = connectionName,
-            Connection = connection,
-            Socket = socket
-        };
     }
 }

@@ -48,7 +48,7 @@ public readonly partial struct Metadatum
                     if (level > ValidationLevel.Basic)
                     {
                         result = result.UsingStack();
-                        result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Metadatum/anyOf/1/oneOf/2/properties/bytes");
+                        result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/Metadatum/anyOf/1/oneOf/2/properties/bytes");
                     }
 
                     JsonValueKind valueKind = this.ValueKind;

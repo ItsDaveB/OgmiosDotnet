@@ -37,7 +37,7 @@ public readonly partial struct GovernanceVoter
             if (level > ValidationLevel.Basic)
             {
                 result = result.UsingStack();
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/GovernanceVoter/oneOf/2");
+                result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/GovernanceVoter/oneOf/2");
             }
 
             JsonValueKind valueKind = this.ValueKind;

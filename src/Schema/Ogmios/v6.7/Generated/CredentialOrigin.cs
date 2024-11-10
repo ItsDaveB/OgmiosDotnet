@@ -62,7 +62,7 @@ public readonly partial struct CredentialOrigin
     /// <summary>
     /// Gets the schema location from which this type was generated.
     /// </summary>
-    public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/CredentialOrigin";
+    public static string SchemaLocation { get; } = "Ogmios/Generated/cardano.json#/definitions/CredentialOrigin";
 
     /// <summary>
     /// Gets a Null instance.

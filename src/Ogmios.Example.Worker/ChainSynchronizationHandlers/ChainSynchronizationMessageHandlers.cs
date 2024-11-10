@@ -1,5 +1,5 @@
 using Generated;
-using static Ogmios.Services.ChainSynchronization.BlockService;
+using Ogmios.Services.ChainSynchronization;
 namespace ChainSynchronizationWorker.ChainSynchronizationHandlers;
 
 public class ChainSynchronizationMessageHandlers : IChainSynchronizationMessageHandlers

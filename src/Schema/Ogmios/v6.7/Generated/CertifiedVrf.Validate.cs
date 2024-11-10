@@ -31,7 +31,7 @@ public readonly partial struct CertifiedVrf
         if (level > ValidationLevel.Basic)
         {
             result = result.UsingStack();
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/CertifiedVrf");
+            result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/CertifiedVrf");
         }
 
         JsonValueKind valueKind = this.ValueKind;

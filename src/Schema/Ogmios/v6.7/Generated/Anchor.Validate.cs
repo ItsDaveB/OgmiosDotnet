@@ -31,7 +31,7 @@ public readonly partial struct Anchor
         if (level > ValidationLevel.Basic)
         {
             result = result.UsingStack();
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Anchor");
+            result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/Anchor");
         }
 
         JsonValueKind valueKind = this.ValueKind;

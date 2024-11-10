@@ -52,7 +52,7 @@ public readonly partial struct Ogmios
                     if (level > ValidationLevel.Basic)
                     {
                         result = result.UsingStack();
-                        result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/ogmios.json#/definitions/SubmitTransactionFailure<MissingCostModels>/properties/data/properties/missingCostModels");
+                        result = result.PushSchemaLocation("Ogmios/Generated/ogmios.json#/definitions/SubmitTransactionFailure<MissingCostModels>/properties/data/properties/missingCostModels");
                     }
 
                     JsonValueKind valueKind = this.ValueKind;

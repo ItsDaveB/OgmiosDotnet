@@ -73,7 +73,7 @@ public readonly partial struct GovernanceVote
         /// <summary>
         /// Gets the schema location from which this type was generated.
         /// </summary>
-        public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/GovernanceVote/properties/vote";
+        public static string SchemaLocation { get; } = "Ogmios/Generated/cardano.json#/definitions/GovernanceVote/properties/vote";
 
         /// <summary>
         /// Gets a Null instance.

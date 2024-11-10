@@ -80,7 +80,7 @@ public readonly partial struct Address
     /// <summary>
     /// Gets the schema location from which this type was generated.
     /// </summary>
-    public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Address";
+    public static string SchemaLocation { get; } = "Ogmios/Generated/cardano.json#/definitions/Address";
 
     /// <summary>
     /// Gets a Null instance.

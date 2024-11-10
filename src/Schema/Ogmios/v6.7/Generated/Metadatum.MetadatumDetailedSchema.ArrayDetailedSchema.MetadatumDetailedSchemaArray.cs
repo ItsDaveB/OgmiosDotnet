@@ -79,7 +79,7 @@ public readonly partial struct Metadatum
                 /// <summary>
                 /// Gets the schema location from which this type was generated.
                 /// </summary>
-                public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Metadatum/anyOf/1/oneOf/3/properties/list";
+                public static string SchemaLocation { get; } = "Ogmios/Generated/cardano.json#/definitions/Metadatum/anyOf/1/oneOf/3/properties/list";
 
                 /// <summary>
                 /// Gets a Null instance.

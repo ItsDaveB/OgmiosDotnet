@@ -57,7 +57,7 @@ public readonly partial struct Ogmios
                         if (level > ValidationLevel.Basic)
                         {
                             result = result.UsingStack();
-                            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/ogmios.json#/definitions/EvaluateTransactionFailure/oneOf/2/properties/data/properties/overlappingOutputReferences");
+                            result = result.PushSchemaLocation("Ogmios/Generated/ogmios.json#/definitions/EvaluateTransactionFailure/oneOf/2/properties/data/properties/overlappingOutputReferences");
                         }
 
                         JsonValueKind valueKind = this.ValueKind;

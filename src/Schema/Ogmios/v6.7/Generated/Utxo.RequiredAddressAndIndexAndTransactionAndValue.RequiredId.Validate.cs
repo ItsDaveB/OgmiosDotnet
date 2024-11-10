@@ -42,7 +42,7 @@ public readonly partial struct Utxo
                 if (level > ValidationLevel.Basic)
                 {
                     result = result.UsingStack();
-                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Utxo/items/properties/transaction");
+                    result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/Utxo/items/properties/transaction");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;

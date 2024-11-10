@@ -80,7 +80,7 @@ public readonly partial struct Ratio
     /// <summary>
     /// Gets the schema location from which this type was generated.
     /// </summary>
-    public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Ratio";
+    public static string SchemaLocation { get; } = "Ogmios/Generated/cardano.json#/definitions/Ratio";
 
     /// <summary>
     /// Gets a Null instance.

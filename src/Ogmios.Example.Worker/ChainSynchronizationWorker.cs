@@ -17,7 +17,7 @@ namespace Ogmios.Example.Worker
             try
             {
                 var contexts = new List<Ogmios.Domain.InteractionContext>();
-                var startingPoints = _configuration.GetSection("StartingPoints").Get<List<Ogmios.Domain.StartingPointConfiguration>>();
+                var startingPoints = _configuration.GetSection("StartingPoints").Get<List<Domain.StartingPointConfiguration>>();
 
                 for (int i = 0; i < startingPoints?.Count; i++)
                 {

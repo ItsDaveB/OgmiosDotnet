@@ -36,7 +36,7 @@ public readonly partial struct TransactionOutput
         if (level > ValidationLevel.Basic)
         {
             result = result.UsingStack();
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/TransactionOutput");
+            result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/TransactionOutput");
         }
 
         JsonValueKind valueKind = this.ValueKind;

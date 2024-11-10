@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
-using Ogmios.Domain.ChainSynchronization;
+using Ogmios.Services.ChainSynchronization;
 using Ogmios.Services.InteractionContext;
 
-namespace Ogmios.Domain.Extensions
+namespace Ogmios.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -12,7 +12,9 @@ namespace Ogmios.Domain.Extensions
             services.AddSingleton<IChainSynchronizationClientService, ChainSynchronizationClientService>();
             services.AddSingleton<IIntersectionService, IntersectionService>();
             services.AddSingleton<IInteractionContextFactory, InteractionContextFactory>();
-            services.AddSingleton<BlockService>();
+            services.AddSingleton<IBlockService, BlockService>();
+            services.AddSingleton<IWebSocketService, WebSocketService>();
+
             return services;
         }
     }

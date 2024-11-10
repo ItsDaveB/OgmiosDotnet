@@ -75,7 +75,7 @@ public readonly partial struct StakeAddress
     /// <summary>
     /// Gets the schema location from which this type was generated.
     /// </summary>
-    public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/StakeAddress";
+    public static string SchemaLocation { get; } = "Ogmios/Generated/cardano.json#/definitions/StakeAddress";
 
     /// <summary>
     /// Gets a Null instance.

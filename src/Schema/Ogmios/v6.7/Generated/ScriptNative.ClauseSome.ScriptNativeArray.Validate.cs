@@ -47,7 +47,7 @@ public readonly partial struct ScriptNative
                 if (level > ValidationLevel.Basic)
                 {
                     result = result.UsingStack();
-                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/Script<Native>/oneOf/3/properties/from");
+                    result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/Script<Native>/oneOf/3/properties/from");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;

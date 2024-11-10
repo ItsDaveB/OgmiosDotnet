@@ -63,7 +63,7 @@ public readonly partial struct GovernanceProposal
     /// <summary>
     /// Gets the schema location from which this type was generated.
     /// </summary>
-    public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/GovernanceProposal";
+    public static string SchemaLocation { get; } = "Ogmios/Generated/cardano.json#/definitions/GovernanceProposal";
 
     /// <summary>
     /// Gets a Null instance.

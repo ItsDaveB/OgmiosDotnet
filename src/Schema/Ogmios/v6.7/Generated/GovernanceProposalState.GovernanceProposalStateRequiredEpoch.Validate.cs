@@ -37,7 +37,7 @@ public readonly partial struct GovernanceProposalState
             if (level > ValidationLevel.Basic)
             {
                 result = result.UsingStack();
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Domain/Schemas/Ogmios/Generated/cardano.json#/definitions/GovernanceProposalState/properties/until");
+                result = result.PushSchemaLocation("Ogmios/Generated/cardano.json#/definitions/GovernanceProposalState/properties/until");
             }
 
             JsonValueKind valueKind = this.ValueKind;
