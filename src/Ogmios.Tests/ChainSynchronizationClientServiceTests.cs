@@ -95,7 +95,6 @@ namespace Ogmios.Tests
             var mockSocket = Mock.Get(interactionContext.Socket);
             int callCount = 0;
 
-            // Setup the mocked WebSocket behavior to queue a message
             mockSocket.Setup(x => x.ReceiveAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((ArraySegment<byte> segment, CancellationToken token) =>
                 {
@@ -108,7 +107,6 @@ namespace Ogmios.Tests
                 });
 
             // Act
-            // Start the WebSocket listening, which should queue the message
             await _service.ResumeListeningAsync(interactionContext, cancellationTokenSource.Token);
 
             // Use a short delay to ensure the message is queued before processing
@@ -193,7 +191,6 @@ namespace Ogmios.Tests
                 method: "findIntersection",
                 result: Generated.Ogmios.FindIntersectionResponseEntity.IntersectionFound.RequiredIntersectionAndTip.Create(intersection: point, tip: tip));
 
-            // Setup the mock to return the expected Intersection object
             _mockIntersectionService
                 .Setup(x => x.FindIntersectionAsync(
                     It.Is<InteractionContext>(ctx => ctx == interactionContext),

@@ -5,7 +5,7 @@ namespace Ogmios.Services.ServerHealth;
 
 public class ServerHealthService(HttpClient httpClient) : IServerHealthService
 {
-    private readonly HttpClient _httpClient = httpClient;
+    private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
     public async Task<Domain.Server.ServerHealth> GetServerHealthAsync(Uri serverAddress)
     {
@@ -14,43 +14,52 @@ public class ServerHealthService(HttpClient httpClient) : IServerHealthService
             throw new ArgumentNullException(nameof(serverAddress));
         }
 
-        if (!Uri.IsWellFormedUriString(serverAddress.ToString(), UriKind.Absolute))
-            throw new ArgumentException("The provided server address is not a valid absolute URI.", nameof(serverAddress));
-
-        Uri healthUri;
-        try
-        {
-            healthUri = new Uri(serverAddress, "health");
-        }
-        catch (UriFormatException ex)
-        {
-            throw new ArgumentException("The provided URI is not in a valid format.", nameof(serverAddress), ex);
-        }
+        var healthUri = BuildHealthUri(serverAddress);
 
         HttpResponseMessage response;
         try
         {
             response = await _httpClient.GetAsync(healthUri);
+            response.EnsureSuccessStatusCode();
         }
         catch (HttpRequestException ex)
         {
-            throw new Exception("An error occurred while making the HTTP request.", ex);
+            throw new HttpRequestException($"An error occurred while fetching server health from {healthUri}.", ex);
         }
 
-        if (!response.IsSuccessStatusCode)
-            throw new Exception($"Failed to fetch server health. Status: {response.StatusCode}, Reason: {response.ReasonPhrase}.");
+        return await ParseServerHealthResponseAsync(response);
+    }
 
+    private static Uri BuildHealthUri(Uri serverAddress)
+    {
+        if (!Uri.IsWellFormedUriString(serverAddress.ToString(), UriKind.Absolute))
+            throw new ArgumentException("The provided server address is not a valid absolute URI.", nameof(serverAddress));
+
+        return new UriBuilder(serverAddress) { Path = "health" }.Uri;
+    }
+
+    private async Task<Domain.Server.ServerHealth> ParseServerHealthResponseAsync(HttpResponseMessage response)
+    {
         var responseBody = await response.Content.ReadAsStringAsync();
-        var serverHealth = JsonSerializer.Deserialize<Domain.Server.ServerHealth>(responseBody, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        }) ?? throw new Exception("Failed to deserialize server health response.");
 
-        if (string.IsNullOrWhiteSpace(serverHealth.LastTipUpdate))
+        try
         {
-            throw new ServerNotReadyException(serverHealth);
+            var serverHealth = JsonSerializer.Deserialize<Domain.Server.ServerHealth>(responseBody, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (serverHealth is null)
+                throw new InvalidOperationException("Server health response deserialized to null.");
+
+            if (string.IsNullOrWhiteSpace(serverHealth.LastTipUpdate))
+                throw new ServerNotReadyException(serverHealth);
+
+            return serverHealth;
         }
-
-        return serverHealth;
+        catch (JsonException ex)
+        {
+            throw new Exception("Failed to deserialize the server health response.", ex);
+        }
     }
 }
