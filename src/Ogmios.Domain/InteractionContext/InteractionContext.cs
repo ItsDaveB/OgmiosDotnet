@@ -1,5 +1,3 @@
-using Ogmios.Services.ChainSynchronization;
-
 namespace Ogmios.Domain;
 
 public class InteractionContext

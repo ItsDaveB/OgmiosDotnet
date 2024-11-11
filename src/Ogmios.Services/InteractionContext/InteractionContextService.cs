@@ -1,9 +1,10 @@
 using Ogmios.Domain;
 using Ogmios.Services.ChainSynchronization;
+using Ogmios.Services.ServerHealth;
 
 namespace Ogmios.Services.InteractionContext;
 
-public class InteractionContextService(IWebSocketService webSocketService) : IInteractionContextService
+public class InteractionContextService(IWebSocketService webSocketService, IServerHealthService serverHealthService) : IInteractionContextService
 {
     public Connection CreateConnectionObject(ConnectionConfig config)
     {
@@ -31,16 +32,15 @@ public class InteractionContextService(IWebSocketService webSocketService) : IIn
     public async Task<Domain.InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint, ConnectionConfig connectionConfiguration)
     {
         var connection = CreateConnectionObject(connectionConfiguration);
-        // var health = await GetServerHealthAsync(connection);
+        var health = await serverHealthService.GetServerHealthAsync(connection.AddressHttp);
 
-        // if (health.LastTipUpdate == null)
-        // {
-        //     throw new Exception("Server not ready.");
-        // }
+        if (health.LastTipUpdate == null)
+        {
+            throw new Exception("Server not ready.");
+        }
 
         try
         {
-
             var socket = await webSocketService.ConnectAsync(connection.AddressWebSocket, connectionConfiguration, CancellationToken.None);
 
             return new Domain.InteractionContext

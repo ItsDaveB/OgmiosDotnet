@@ -1,9 +1,10 @@
 using Ogmios.Domain;
 using Ogmios.Services.ChainSynchronization;
+using Ogmios.Services.ServerHealth;
 
 namespace Ogmios.Services.InteractionContext;
 
-public class InteractionContextFactory(IWebSocketService webSocketService) : IInteractionContextFactory
+public class InteractionContextFactory(IWebSocketService webSocketService, IServerHealthService serverHealthService) : IInteractionContextFactory
 {
     public Task<Domain.InteractionContext> CreateInteractionContextAsync(string connectionName, StartingPointConfiguration startingPoint, OgmiosConfiguration ogmiosConfiguration)
     {
@@ -13,7 +14,7 @@ public class InteractionContextFactory(IWebSocketService webSocketService) : IIn
         }
 
         var config = new ConnectionConfig { Host = ogmiosConfiguration.Host, Port = ogmiosConfiguration.Port };
-        var service = new InteractionContextService(webSocketService);
+        var service = new InteractionContextService(webSocketService, serverHealthService);
 
         return service.CreateInteractionContextAsync(connectionName, startingPoint, config);
     }
