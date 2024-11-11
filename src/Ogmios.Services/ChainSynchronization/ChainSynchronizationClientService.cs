@@ -137,7 +137,7 @@ namespace Ogmios.Services.ChainSynchronization
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error requesting next block: {ex.Message}");
+                Console.WriteLine($"Error requesting next block: {ex.Message}.");
             }
         }
 

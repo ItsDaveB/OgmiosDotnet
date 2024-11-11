@@ -9,11 +9,10 @@ public class InteractionContextFactory(IWebSocketService webSocketService) : IIn
     {
         if (string.IsNullOrWhiteSpace(ogmiosConfiguration?.Host))
         {
-            throw new ArgumentException("OgmiosHost configuration is missing or empty.");
+            throw new ArgumentException("Ogmios Host configuration is missing or empty.");
         }
 
         var config = new ConnectionConfig { Host = ogmiosConfiguration.Host, Port = ogmiosConfiguration.Port };
-
         var service = new InteractionContextService(webSocketService);
 
         return service.CreateInteractionContextAsync(connectionName, startingPoint, config);

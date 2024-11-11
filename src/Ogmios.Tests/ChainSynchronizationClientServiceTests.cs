@@ -270,57 +270,5 @@ namespace Ogmios.Tests
                 Socket = mockSocket.Object
             };
         }
-
-        // [Fact]
-        // public async Task ProcessMessagesAsync_PerformsBetterWithPipelining()
-        // {
-        //     // Arrange
-        //     var messageCount = 1000;
-        //     var interactionContext = CreateMockInteractionContext();
-        //     var messages = Enumerable.Range(0, messageCount).Select(i => $"Message {i}").ToArray();
-        //     var buffers = messages.Select(Encoding.UTF8.GetBytes).ToArray();
-
-        //     var mockSocket = Mock.Get(interactionContext.Socket);
-        //     int callCount = 0;
-        //     mockSocket.Setup(x => x.ReceiveAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<CancellationToken>()))
-        //         .ReturnsAsync((ArraySegment<byte> segment, CancellationToken token) =>
-        //         {
-        //             if (callCount < buffers.Length)
-        //             {
-        //                 Array.Copy(buffers[callCount], segment.Array, buffers[callCount].Length);
-        //                 return new WebSocketReceiveResult(buffers[callCount++].Length, WebSocketMessageType.Text, true);
-        //             }
-        //             return new WebSocketReceiveResult(0, WebSocketMessageType.Close, true);
-        //         });
-
-        //     // Act
-        //     var stopwatch = Stopwatch.StartNew();
-        //     await _service.ResumeListeningAsync(interactionContext, CancellationToken.None);
-        //     await _service.ProcessMessagesAsync(CancellationToken.None);
-        //     stopwatch.Stop();
-        //     var nonPipelinedTime = stopwatch.ElapsedMilliseconds;
-
-        //     // Measure with pipelining
-        //     _service.EnablePipelining(); // Hypothetical method to enable pipelining
-        //     stopwatch.Restart();
-        //     await _service.ProcessMessagesAsync(CancellationToken.None);
-        //     stopwatch.Stop();
-        //     var pipelinedTime = stopwatch.ElapsedMilliseconds;
-
-        //     // Assert
-        //     Assert.True(pipelinedTime < nonPipelinedTime, "Pipelined processing should be faster than non-pipelined.");
-        // }
-
-        //     [Fact]
-        //     public async Task ClientMethods_ThrowException_AfterShutdown()
-        //     {
-        //         // Arrange
-        //         var interactionContext = CreateMockInteractionContext();
-        //         await _service.ResumeListeningAsync(interactionContext, CancellationToken.None);
-        //         await _service.ShutdownAsync(interactionContext);
-
-        //         // Act & Assert
-        //         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.ResumeListeningAsync(interactionContext, CancellationToken.None));
-        //     }
     }
 }
