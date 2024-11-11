@@ -3,7 +3,6 @@ using Generated;
 using Moq;
 using Ogmios.Services.ChainSynchronization;
 using static Generated.Ogmios;
-using static Ogmios.Services.ChainSynchronization.BlockService;
 
 namespace Ogmios.Tests;
 
@@ -15,7 +14,7 @@ public class ChainSynchronizationMessageHandlersTests
     public ChainSynchronizationMessageHandlersTests()
     {
         _mockHandlers = new Mock<IChainSynchronizationMessageHandlers>();
-        _blockService = new BlockService();
+        _blockService = new BlockService(new WebSocketService());
     }
 
     [Fact]

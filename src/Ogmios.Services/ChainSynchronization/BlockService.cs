@@ -39,7 +39,7 @@ public class BlockService(IWebSocketService webSocketService) : IBlockService
                 var block = result.Instance.Result.AsRollForward.Block;
                 if (block.HasProperty("height") && block.TryGetProperty("height", out var height) && block.HasProperty("type") && block.TryGetProperty("type", out var type))
                 {
-                    var blockheight = (long)height.AsNumber;
+                    var blockheight = (string)height.AsString;
                     var blocktype = (string)type.AsString ?? "Unknown type";
 
                     Console.WriteLine($"Processed block height: {blockheight}");
