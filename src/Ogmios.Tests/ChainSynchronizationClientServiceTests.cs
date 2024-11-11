@@ -113,7 +113,7 @@ namespace Ogmios.Tests
 
             // Use a short delay to ensure the message is queued before processing
             cancellationTokenSource.CancelAfter(2000);
-            await _service.ProcessMessagesAsync(cancellationTokenSource.Token);
+            await _service.ProcessMessagesAsync(maxBlocksPerSecond: 100, cancellationTokenSource.Token);
 
             // Assert
             _mockBlockService.Verify(
@@ -171,7 +171,7 @@ namespace Ogmios.Tests
 
             // Use a short delay to ensure the message is queued before processing
             cancellationTokenSource.CancelAfter(2000);
-            await _service.ProcessMessagesAsync(cancellationTokenSource.Token);
+            await _service.ProcessMessagesAsync(maxBlocksPerSecond: 100, cancellationTokenSource.Token);
 
             // Assert
             Assert.Equal(3, messageLog.Count);
@@ -202,7 +202,7 @@ namespace Ogmios.Tests
                 .ReturnsAsync(intersectionFound);
 
             // Act
-            var intersection = await _service.ResumeAsync([interactionContext], inFlight: 10, CancellationToken.None);
+            var intersection = await _service.ResumeAsync([interactionContext], maxBlocksPerSecond: 100, inFlight: 10, CancellationToken.None);
 
             // Assert
             Assert.Equal(interactionContext.StartingPoint.StartingPointIdOrOrigin, intersection.First().StartingPointIdOrOrigin);
@@ -223,7 +223,7 @@ namespace Ogmios.Tests
             // Act & Assert
             await Assert.ThrowsAsync<IntersectionNotFoundException>(async () =>
             {
-                await _service.ResumeAsync([interactionContext], inFlight: 10, CancellationToken.None);
+                await _service.ResumeAsync([interactionContext], maxBlocksPerSecond: 100, inFlight: 10, CancellationToken.None);
             });
         }
 
@@ -235,7 +235,7 @@ namespace Ogmios.Tests
             interactionContext.StartingPoint.StartingPointIdOrOrigin = "origin";
 
             // Act
-            var intersection = await _service.ResumeAsync([interactionContext], inFlight: 10, CancellationToken.None);
+            var intersection = await _service.ResumeAsync([interactionContext], maxBlocksPerSecond: 100, inFlight: 10, CancellationToken.None);
 
             // Assert
             Assert.Equal("origin", intersection.First().StartingPointIdOrOrigin);
