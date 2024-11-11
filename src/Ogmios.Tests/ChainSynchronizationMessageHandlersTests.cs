@@ -64,7 +64,7 @@ public class ChainSynchronizationMessageHandlersTests
                                                    NextBlockResponse.ResultEntity.RollBackward.Create(NextBlockResponse.ResultEntity.RollBackward.DirectionEntity.EnumValues.Backward,
                                                    NextBlockResponse.ResultEntity.RollBackward.DefaultInstance.Point, NextBlockResponse.ResultEntity.RollBackward.DefaultInstance.Tip)),
             "forward" => NextBlockResponse.Create(NextBlockResponse.JsonrpcEntity.EnumValues.V20, NextBlockResponse.MethodEntity.EnumValues.NextBlock,
-                                                  NextBlockResponse.ResultEntity.RollForward.Create(BlockPraos.FromProperties(new Dictionary<JsonPropertyName, JsonAny> { { new JsonPropertyName("height"), JsonAny.FromAny("18446744073709552000") }, { new JsonPropertyName("type"), JsonAny.FromAny(BlockPraos.TypeEntity.EnumValues.Praos) } }), NextBlockResponse.ResultEntity.RollForward.DirectionEntity.EnumValues.Forward, NextBlockResponse.ResultEntity.RollForward.DefaultInstance.Tip)),
+                                                  NextBlockResponse.ResultEntity.RollForward.Create(BlockPraos.FromProperties(new Dictionary<JsonPropertyName, JsonAny> { { new JsonPropertyName("height"), JsonNumber.ParseValue("115545883") }, { new JsonPropertyName("type"), JsonAny.FromAny(BlockPraos.TypeEntity.EnumValues.Praos) } }), NextBlockResponse.ResultEntity.RollForward.DirectionEntity.EnumValues.Forward, NextBlockResponse.ResultEntity.RollForward.DefaultInstance.Tip)),
             _ => throw new ArgumentException("Invalid direction")
         };
     }
