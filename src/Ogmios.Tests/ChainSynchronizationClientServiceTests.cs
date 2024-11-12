@@ -26,6 +26,7 @@ namespace Ogmios.Tests
             _service = new ChainSynchronizationClientService(_mockMessageHandlers.Object, _mockIntersectionService.Object, _mockBlockService.Object);
         }
 
+        // TC001
         [Fact]
         public async Task ResumeListeningAsync_ClosesSocketOnCloseMessage()
         {
@@ -44,6 +45,7 @@ namespace Ogmios.Tests
             mockSocket.Verify(x => x.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", It.IsAny<CancellationToken>()), Times.Once);
         }
 
+        // TC002
         [Fact]
         public async Task ResumeListeningAsync_QueuesWebSocketResponseMessages()
         {
@@ -83,6 +85,70 @@ namespace Ogmios.Tests
             );
         }
 
+        // TC003
+        [Fact]
+        public async Task ResumeListeningAsync_SelectsTipAsIntersection_WhenNoPointProvided()
+        {
+            // Arrange
+            var interactionContext = CreateMockInteractionContext();
+            var point = Point.Create(id: interactionContext.StartingPoint.StartingPointIdOrOrigin, slot: Slot.FromAny(interactionContext.StartingPoint.StartingPointSlot));
+            var tip = Tip.Create(height: BlockHeight.FromAny(string.Empty), id: interactionContext.StartingPoint.StartingPointIdOrOrigin, Slot.FromAny(interactionContext.StartingPoint.StartingPointSlot));
+
+            var intersectionFound = Generated.Ogmios.FindIntersectionResponseEntity.IntersectionFound.Create(
+                jsonrpc: "2.0",
+                method: "findIntersection",
+                result: Generated.Ogmios.FindIntersectionResponseEntity.IntersectionFound.RequiredIntersectionAndTip.Create(intersection: point, tip: tip));
+
+            _mockIntersectionService
+                .Setup(x => x.FindIntersectionAsync(
+                    It.Is<InteractionContext>(ctx => ctx == interactionContext),
+                    It.IsAny<StartingPointConfiguration>(),
+                    It.IsAny<MirrorOptions>()))
+                .ReturnsAsync(intersectionFound);
+
+            // Act
+            var intersection = await _service.ResumeAsync([interactionContext], maxBlocksPerSecond: 100, inFlight: 10, CancellationToken.None);
+
+            // Assert
+            Assert.Equal(interactionContext.StartingPoint.StartingPointIdOrOrigin, intersection.First().StartingPointIdOrOrigin);
+            Assert.Equal(interactionContext.StartingPoint.StartingPointSlot, intersection.First().StartingPointSlot);
+        }
+
+        // TC004
+        [Fact]
+        public async Task ResumeListeningAsync_ThrowsIntersectionNotFoundException_WhenNoIntersectionFound()
+        {
+            // Arrange
+            var interactionContext = CreateMockInteractionContext();
+            _mockIntersectionService.Setup(x => x.FindIntersectionAsync
+                    (It.Is<InteractionContext>(ctx => ctx == interactionContext),
+                    It.IsAny<StartingPointConfiguration>(),
+                    It.IsAny<MirrorOptions>()))
+                .ThrowsAsync(new IntersectionNotFoundException("No intersection found"));
+
+            // Act & Assert
+            await Assert.ThrowsAsync<IntersectionNotFoundException>(async () =>
+            {
+                await _service.ResumeAsync([interactionContext], maxBlocksPerSecond: 100, inFlight: 10, CancellationToken.None);
+            });
+        }
+
+        // TC005
+        [Fact]
+        public async Task ResumeListeningAsync_IntersectsAtGenesis_WhenOriginProvidedAsPoint()
+        {
+            // Arrange
+            var interactionContext = CreateMockInteractionContext();
+            interactionContext.StartingPoint.StartingPointIdOrOrigin = "origin";
+
+            // Act
+            var intersection = await _service.ResumeAsync([interactionContext], maxBlocksPerSecond: 100, inFlight: 10, CancellationToken.None);
+
+            // Assert
+            Assert.Equal("origin", intersection.First().StartingPointIdOrOrigin);
+        }
+
+        // TC006
         [Fact]
         public async Task ProcessMessagesAsync_ProcessesQueuedMessagesFromWebSocketResponse()
         {
@@ -121,6 +187,7 @@ namespace Ogmios.Tests
             );
         }
 
+        // TC007
         [Fact]
         public async Task ResumeListeningAsync_ProcessesMessagesInCorrectOrder()
         {
@@ -176,66 +243,6 @@ namespace Ogmios.Tests
             Assert.Equal(message1, messageLog[0]);
             Assert.Equal(message2, messageLog[1]);
             Assert.Equal(message3, messageLog[2]);
-        }
-
-        [Fact]
-        public async Task ResumeListeningAsync_SelectsTipAsIntersection_WhenNoPointProvided()
-        {
-            // Arrange
-            var interactionContext = CreateMockInteractionContext();
-            var point = Point.Create(id: interactionContext.StartingPoint.StartingPointIdOrOrigin, slot: Slot.FromAny(interactionContext.StartingPoint.StartingPointSlot));
-            var tip = Tip.Create(height: BlockHeight.FromAny(string.Empty), id: interactionContext.StartingPoint.StartingPointIdOrOrigin, Slot.FromAny(interactionContext.StartingPoint.StartingPointSlot));
-
-            var intersectionFound = Generated.Ogmios.FindIntersectionResponseEntity.IntersectionFound.Create(
-                jsonrpc: "2.0",
-                method: "findIntersection",
-                result: Generated.Ogmios.FindIntersectionResponseEntity.IntersectionFound.RequiredIntersectionAndTip.Create(intersection: point, tip: tip));
-
-            _mockIntersectionService
-                .Setup(x => x.FindIntersectionAsync(
-                    It.Is<InteractionContext>(ctx => ctx == interactionContext),
-                    It.IsAny<StartingPointConfiguration>(),
-                    It.IsAny<MirrorOptions>()))
-                .ReturnsAsync(intersectionFound);
-
-            // Act
-            var intersection = await _service.ResumeAsync([interactionContext], maxBlocksPerSecond: 100, inFlight: 10, CancellationToken.None);
-
-            // Assert
-            Assert.Equal(interactionContext.StartingPoint.StartingPointIdOrOrigin, intersection.First().StartingPointIdOrOrigin);
-            Assert.Equal(interactionContext.StartingPoint.StartingPointSlot, intersection.First().StartingPointSlot);
-        }
-
-        [Fact]
-        public async Task ResumeListeningAsync_ThrowsIntersectionNotFoundException_WhenNoIntersectionFound()
-        {
-            // Arrange
-            var interactionContext = CreateMockInteractionContext();
-            _mockIntersectionService.Setup(x => x.FindIntersectionAsync
-                    (It.Is<InteractionContext>(ctx => ctx == interactionContext),
-                    It.IsAny<StartingPointConfiguration>(),
-                    It.IsAny<MirrorOptions>()))
-                .ThrowsAsync(new IntersectionNotFoundException("No intersection found"));
-
-            // Act & Assert
-            await Assert.ThrowsAsync<IntersectionNotFoundException>(async () =>
-            {
-                await _service.ResumeAsync([interactionContext], maxBlocksPerSecond: 100, inFlight: 10, CancellationToken.None);
-            });
-        }
-
-        [Fact]
-        public async Task ResumeListeningAsync_IntersectsAtGenesis_WhenOriginProvidedAsPoint()
-        {
-            // Arrange
-            var interactionContext = CreateMockInteractionContext();
-            interactionContext.StartingPoint.StartingPointIdOrOrigin = "origin";
-
-            // Act
-            var intersection = await _service.ResumeAsync([interactionContext], maxBlocksPerSecond: 100, inFlight: 10, CancellationToken.None);
-
-            // Assert
-            Assert.Equal("origin", intersection.First().StartingPointIdOrOrigin);
         }
 
         private static InteractionContext CreateMockInteractionContext(WebSocketState socketState = WebSocketState.Open)

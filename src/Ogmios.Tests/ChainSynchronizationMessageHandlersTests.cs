@@ -17,6 +17,7 @@ public class ChainSynchronizationMessageHandlersTests
         _blockService = new BlockService(new WebSocketService());
     }
 
+    // TC008
     [Fact]
     public async Task HandleNextBlockAsync_CallsRollBackwardHandler_WhenDirectionIsBackward()
     {
@@ -36,6 +37,7 @@ public class ChainSynchronizationMessageHandlersTests
         _mockHandlers.Verify(h => h.RollBackwardHandler(It.IsAny<PointOrOrigin>(), It.IsAny<TipOrOrigin>()), Times.Once);
     }
 
+    // TC009
     [Fact]
     public async Task HandleNextBlockAsync_CallsRollForwardHandler_WhenDirectionIsForward()
     {
