@@ -1,15 +1,11 @@
 # Software Test Report
 
-## 1. Title Page
-
 **Project Name:** OgmiosDotnetClient  
 **Report Title:** Software Test Report for OgmiosDotnetClient  
-**Date:** 11/11/2024
+**Date:** 11/11/2024  
 **Author(s):** Dave B
 
 ---
-
-## 2. Table of Contents
 
 1. [Introduction](#introduction)
 2. [Test Objectives](#test-objectives)
@@ -22,7 +18,7 @@
 
 ---
 
-## 3. Introduction
+## Introduction
 
 **Purpose:**  
 This report documents the testing process, findings, and outcomes for the OgmiosDotnetClient project. The objective is to ensure that the ChainSynchronizationClient and its core functionality for reading blockchain data from a specific point or origin meet the required standards to avoid regressions.
@@ -35,7 +31,7 @@ This report is intended for reviewers.
 
 ---
 
-## 4. Test Objectives
+## Test Objectives
 
 - Verify the ChainSynchronizationClient's ability to resume listening for WebSocket messages.
 - Ensure queued WebSocket response messages are processed correctly.
@@ -45,7 +41,7 @@ This report is intended for reviewers.
 
 ---
 
-## 5. Test Environment
+## Test Environment
 
 **Software:**
 
@@ -59,7 +55,7 @@ This report is intended for reviewers.
 
 ---
 
-## 6. Test Scope
+## Test Scope
 
 **In-Scope:**
 
@@ -72,7 +68,7 @@ This report is intended for reviewers.
 
 ---
 
-## 7. Test Approach
+## Test Approach
 
 **Methodology:**  
 The following testing methodologies were used:
@@ -85,7 +81,7 @@ The following testing methodologies were used:
 
 ---
 
-## 8. Test Cases Executed
+## Test Cases Executed
 
 | **Test Case ID** | **Description**                                                                         | **Status** | **Priority** | **Remarks**                                      |
 | ---------------- | --------------------------------------------------------------------------------------- | ---------- | ------------ | ------------------------------------------------ |
@@ -101,7 +97,7 @@ The following testing methodologies were used:
 
 ---
 
-## 9. Test Results
+## Test Results
 
 **Summary:**
 
@@ -111,6 +107,6 @@ The following testing methodologies were used:
 
 ---
 
-## 10. Conclusion
+## Conclusion
 
 The tests successfully verify the core functionality of the ChainSynchronizationClient, including its ability to process messages, select the appropriate intersection point, and handle errors appropriately. These tests cover the ChainSynchronizationClient and the core functionality of reading blockchain data from a specific point or origin.
