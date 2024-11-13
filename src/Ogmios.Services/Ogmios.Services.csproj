@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ogmios.Domain\Ogmios.Domain.csproj" />
-    <ProjectReference Include="..\Schema\Ogmios.Schema.csproj" />
+    <ProjectReference Include="..\Ogmios.Schema\Ogmios.Schema.csproj" />
   </ItemGroup>
 
 </Project>
