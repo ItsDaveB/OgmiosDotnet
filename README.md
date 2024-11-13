@@ -4,6 +4,14 @@
 
 **OgmiosDotnetClient** is a .NET client library designed to facilitate communication with a Cardano Node via the Ogmios WebSocket interface. It enables developers to synchronize blockchain data from a specific point, retrieve block information, and handle real-time blockchain events effortlessly.
 
+## Modules
+
+This project is divided into the following modules:
+
+- [Chain Synchronization](src/Ogmios.Services/ChainSynchronization/docs/README.md): Covers the chain synchronization process, including real-time updates and blockchain data handling.
+- [Memory Pool Monitoring](src/Ogmios.Services/MemoryPoolMonitoring/README.md): Provides an overview of mempool monitoring for tracking transactions and querying mempool details.
+- [Ogmios Schema](src/Ogmios.Schema/docs/README.md): Contains the auto-generated strongly-typed C# classes based on the Ogmios JSON schema for the version in question.
+
 ## Requirements
 
 To use **OgmiosDotnetClient**, you need:
@@ -52,44 +60,6 @@ The `ChainSynchronizationWorker` is a background service that demonstrates how *
 
 - **IInteractionContextFactory**: Responsible for establishing and managing WebSocket connections to the Cardano node.
 - **IChainSynchronizationClientService**: Handles the synchronization of blockchain data, ensuring that the latest blocks and chain state are processed.
-
-## Custom Event Handlers for Blockchain Synchronization
-
-The `ChainSynchronizationMessageHandlers` class defines basic handlers for two key blockchain events:
-
-- **Roll Forward Events**: Occurs when the blockchain moves forward, processing new blocks.
-- **Roll Backward Events**: Occurs when the blockchain rolls back to a previous state (e.g., when blocks are reorganized).
-
-### Customization:
-
-These handlers can be extended to perform custom actions such as:
-
-- **Data Persistence**: Saving block data to a database or other storage systems.
-- **Processing Blockchain Data**: Executing additional logic based on the blockchain data being processed.
-
-The handlers are triggered every time a block is processed, allowing developers to define actions specific to their application's requirements.
-
-## Example Code:
-
-```csharp
-public class ChainSynchronizationMessageHandlers : IChainSynchronizationMessageHandlers
-{
-    public async Task RollBackwardHandler(Generated.Ogmios.PointOrOrigin point, Generated.Ogmios.TipOrOrigin tip)
-    {
-        await Task.CompletedTask;
-    }
-
-    public async Task RollForwardHandler(Block block, string blockType, Generated.Tip tip)
-    {
-        await Task.CompletedTask;
-    }
-}
-```
-
-## Key Points:
-
-- **RollBackwardHandler**: Can be extended to handle rollback events (e.g., saving rollback data or triggering actions).
-- **RollForwardHandler**: Can be extended to handle new blocks and act on the returned blockchain data (e.g., process or store block information).
 
 ### 4. Configuration
 
