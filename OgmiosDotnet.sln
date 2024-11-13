@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A9B062E5-986A-4238-89D1-7922E43319A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ogmios.Schema", "src\Schema\Ogmios.Schema.csproj", "{012B91A5-F3D0-4D00-9AC5-493862E568EA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ogmios.Schema", "src\Ogmios.Schema\Ogmios.Schema.csproj", "{012B91A5-F3D0-4D00-9AC5-493862E568EA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ogmios.Domain", "src\Ogmios.Domain\Ogmios.Domain.csproj", "{8D75C694-9585-405B-8950-51B1FE76CFB4}"
 EndProject
