@@ -4,7 +4,7 @@ using Ogmios.Services.InteractionContext;
 using Ogmios.Services.MemoryPoolMonitoring;
 using Ogmios.Services.ServerHealth;
 
-namespace Ogmios.Extensions
+namespace Ogmios.Services.Extensions
 {
     public static class ServiceCollectionExtensions
     {

@@ -1,7 +1,7 @@
 
 using ChainSynchronizationWorker.ChainSynchronizationHandlers;
-using Ogmios.Extensions;
 using Ogmios.Services.ChainSynchronization;
+using Ogmios.Services.Extensions;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddOgmiosServices();

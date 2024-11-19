@@ -5,7 +5,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Ogmios.Schema</RootNamespace>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>6.7.0</Version>
+    <Authors>Dave B</Authors>
+    <PackageId>OgmiosDotnetClient.Schema</PackageId>
+    <Description>Versioned auto-generated idiomatic types as a typed representation of Ogmios schema.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression> 
+    <RepositoryUrl>https://github.com/ItsDaveB/OgmiosDotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Ogmios;Blockchain;Cardano;Schema</PackageTags>
   </PropertyGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Corvus.Json.ExtendedTypes" Version="4.0.0-preview.20" />

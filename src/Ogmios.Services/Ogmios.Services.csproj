@@ -5,15 +5,19 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Ogmios.Services</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>6.7.0</Version>
+    <Authors>Dave B</Authors>
+    <PackageId>OgmiosDotnetClient.Services</PackageId>
+    <Description>A set of services and extensions for integrating Ogmios functionality, including chain synchronization, memory pool monitoring, and server health monitoring.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression> 
+    <RepositoryUrl>https://github.com/ItsDaveB/OgmiosDotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Ogmios;Blockchain;Cardano;</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Extensions\**.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Corvus.Json.ExtendedTypes" Version="4.0.0-preview.20" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
