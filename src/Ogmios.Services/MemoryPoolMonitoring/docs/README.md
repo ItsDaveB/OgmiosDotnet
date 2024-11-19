@@ -2,8 +2,6 @@
 
 Memory pool monitoring enables real-time interaction and analysis of the Cardano node's mempool. It allows clients to acquire snapshots, query transactions, and manage system resources efficiently.
 
----
-
 ## Key Operations
 
 1. **Acquire Mempool**: Use `AcquireMempoolAsync` to acquire a snapshot of the mempool. This ensures consistent data and prevents duplicate transaction processing.
@@ -33,15 +31,11 @@ Clients must acquire a snapshot using `AcquireMempoolAsync` before performing an
 2. **Query**: Perform operations such as listing transactions or checking the mempool size.
 3. **Release**: Once done, release the snapshot (`ReleaseMempoolAsync`) to free resources.
 
----
-
 ## Error Handling
 
 1. **Must Acquire Mempool First**: Ensure a snapshot is acquired before operations like `HasTransactionAsync` or `SizeOfMempoolAsync`.
 2. **Transaction Not Found**: Validate the transaction ID if it’s missing from the mempool.
 3. **Timeouts**: Increase the timeout or verify network connectivity if operations take too long.
-
----
 
 ## Summary of Methods
 
@@ -53,8 +47,6 @@ Clients must acquire a snapshot using `AcquireMempoolAsync` before performing an
 | `SizeOfMempoolAsync`   | Get mempool size and capacity. | Requires an active snapshot.            |
 | `ReleaseMempoolAsync`  | Release the acquired snapshot. | Frees resources for other clients.      |
 | `ShutdownAsync`        | Gracefully close WebSocket.    | Ensure all queries are completed first. |
-
----
 
 ## Notes
 
