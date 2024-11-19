@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Ogmios.Services.ChainSynchronization;
 using Ogmios.Services.InteractionContext;
+using Ogmios.Services.MemoryPoolMonitoring;
 using Ogmios.Services.ServerHealth;
 
 namespace Ogmios.Extensions
@@ -15,6 +16,7 @@ namespace Ogmios.Extensions
             services.AddSingleton<IInteractionContextFactory, InteractionContextFactory>();
             services.AddSingleton<IBlockService, BlockService>();
             services.AddSingleton<IWebSocketService, WebSocketService>();
+            services.AddSingleton<IMemoryPoolMonitoringService, MemoryPoolMonitoringService>();
             services.AddHttpClient<IServerHealthService, ServerHealthService>();
 
             return services;

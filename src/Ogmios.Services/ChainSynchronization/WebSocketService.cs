@@ -61,7 +61,27 @@ public class WebSocketService : IWebSocketService
 
     public async Task<string> SendAndWaitForResponseAsync(string message, IClientWebSocket clientWebSocket, int timeoutMilliseconds = 5000, CancellationToken cancellationToken = default)
     {
-        await SendMessageAsync(message, clientWebSocket, cancellationToken);
-        return await ReceiveMessageAsync(clientWebSocket, cancellationToken);
+        try
+        {
+            await SendMessageAsync(message, clientWebSocket, cancellationToken);
+            return await ReceiveMessageAsync(clientWebSocket, cancellationToken);
+        }
+        catch (WebSocketException)
+        {
+            throw;
+        }
+    }
+
+    public async Task CloseAsync(IClientWebSocket clientWebSocket, CancellationToken cancellationToken)
+    {
+        if (clientWebSocket.State == WebSocketState.Open)
+        {
+            await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close requested.", cancellationToken);
+        }
+    }
+
+    public Task CloseAsync(IClientWebSocket clientWebSocket)
+    {
+        throw new NotImplementedException();
     }
 }

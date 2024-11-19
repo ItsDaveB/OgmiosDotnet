@@ -4,12 +4,12 @@ using Moq;
 using Ogmios.Services.ChainSynchronization;
 using static Generated.Ogmios;
 
-namespace Ogmios.Tests;
+namespace Ogmios.Tests.ChainSynchronization;
 
 public class ChainSynchronizationMessageHandlersTests
 {
     private readonly Mock<IChainSynchronizationMessageHandlers> _mockHandlers;
-    private readonly IBlockService _blockService;
+    private readonly BlockService _blockService;
 
     public ChainSynchronizationMessageHandlersTests()
     {

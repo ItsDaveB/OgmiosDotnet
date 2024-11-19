@@ -27,7 +27,7 @@ This report documents the testing process, findings, and outcomes for the Ogmios
 The tests cover the ChainSynchronizationClient and the functionality related to reading blockchain data from a specified point or origin.
 
 **Audience:**  
-This report is intended for reviewers.
+This report is intended for reviewers and the community.
 
 ---
 
@@ -71,9 +71,7 @@ This report is intended for reviewers.
 ## Test Approach
 
 **Methodology:**  
-The following testing methodologies were used:
-
-- Unit Testing
+Unit testing was performed to validate the functionality of the `ChainSynchronizationClient`. Mocked WebSocket responses were used to simulate various scenarios, ensuring isolation and reproducibility of the tests.
 
 **Test Levels:**
 
@@ -105,8 +103,12 @@ The following testing methodologies were used:
 - Passed: 9
 - Failed: 0
 
+All test cases passed successfully, demonstrating that the `ChainSynchronizationClient` meets its functional requirements.
+
 ---
 
 ## Conclusion
 
-The tests successfully verify the core functionality of the ChainSynchronizationClient, including its ability to process messages, select the appropriate intersection point, and handle errors appropriately. These tests cover the ChainSynchronizationClient and the core functionality of reading blockchain data from a specific point or origin.
+The tests successfully verify the core functionality of the `ChainSynchronizationClient`, including its ability to process messages, select the appropriate intersection point, and handle errors appropriately. These tests cover the `ChainSynchronizationClient` and the core functionality of reading blockchain data from a specific point or origin.
+
+No issues or regressions were found during testing.

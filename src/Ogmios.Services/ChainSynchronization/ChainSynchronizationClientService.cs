@@ -1,7 +1,6 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Collections.Concurrent;
-using static Ogmios.Services.ChainSynchronization.BlockService;
 using Ogmios.Domain;
 
 namespace Ogmios.Services.ChainSynchronization
@@ -85,7 +84,7 @@ namespace Ogmios.Services.ChainSynchronization
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error processing messages: {ex.Message}");
+                Console.WriteLine($"Error processing messages: {ex.Message}.");
             }
         }
 
@@ -97,7 +96,7 @@ namespace Ogmios.Services.ChainSynchronization
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error processing block message: {ex.Message}");
+                Console.WriteLine($"Error processing block message: {ex.Message}.");
             }
         }
 

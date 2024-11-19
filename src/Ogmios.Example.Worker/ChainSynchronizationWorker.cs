@@ -1,14 +1,16 @@
 using Ogmios.Domain;
 using Ogmios.Services.ChainSynchronization;
 using Ogmios.Services.InteractionContext;
+using Ogmios.Services.MemoryPoolMonitoring;
 
 namespace Ogmios.Example.Worker
 {
-    public class ChainSynchronizationWorker(ILogger<ChainSynchronizationWorker> logger, IInteractionContextFactory contextFactory, IChainSynchronizationClientService chainSynchronizationClientService, IConfiguration configuration) : BackgroundService
+    public class ChainSynchronizationWorker(ILogger<ChainSynchronizationWorker> logger, IInteractionContextFactory contextFactory, IChainSynchronizationClientService chainSynchronizationClientService, IMemoryPoolMonitoringService memoryPoolMonitoringService, IConfiguration configuration) : BackgroundService
     {
         private readonly ILogger<ChainSynchronizationWorker> _logger = logger;
         private readonly IInteractionContextFactory _contextFactory = contextFactory;
         private readonly IChainSynchronizationClientService _chainSynchronizationClientService = chainSynchronizationClientService;
+        private readonly IMemoryPoolMonitoringService _memoryPoolMonitoringService = memoryPoolMonitoringService;
         private readonly IConfiguration _configuration = configuration;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -29,7 +31,8 @@ namespace Ogmios.Example.Worker
                     contexts.Add(context);
                 }
 
-                var points = await _chainSynchronizationClientService.ResumeAsync(contexts, maxBlocksPerSecond: ogmiosConfiguration.MaxBlocksPerSecond, inFlight: 100, stoppingToken);
+                await PerformChainSynchronizationOperations(contexts, ogmiosConfiguration, stoppingToken);
+                await PerformMemPoolMonitoringOperations(contexts, stoppingToken);
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
@@ -48,6 +51,20 @@ namespace Ogmios.Example.Worker
             {
                 _logger.LogInformation("Worker stopping at: {time}", DateTimeOffset.Now);
             }
+        }
+
+        private async Task PerformChainSynchronizationOperations(List<InteractionContext> contexts, OgmiosConfiguration ogmiosConfiguration, CancellationToken stoppingToken)
+        {
+            var points = await _chainSynchronizationClientService.ResumeAsync(contexts, maxBlocksPerSecond: ogmiosConfiguration.MaxBlocksPerSecond, inFlight: 100, stoppingToken);
+        }
+
+        private async Task PerformMemPoolMonitoringOperations(List<InteractionContext> contexts, CancellationToken stoppingToken)
+        {
+            var mempool = await _memoryPoolMonitoringService.AcquireMempoolAsync(contexts.First(), stoppingToken);
+            var sizeOfMempool = await _memoryPoolMonitoringService.SizeOfMempoolAsync(contexts.First(), stoppingToken);
+            var nextTransaction = await _memoryPoolMonitoringService.NextTransactionAsync(contexts.First(), stoppingToken);
+            var hasTransaction = await _memoryPoolMonitoringService.HasTransactionAsync(contexts.First(), "eddc4a21f5da916a3f8b0a8c1dc6cbeec790d058ce8ecb9390f326489768bbf1", stoppingToken);
+            var releaseMempool = await _memoryPoolMonitoringService.ReleaseMempoolAsync(contexts.First(), stoppingToken);
         }
     }
 }

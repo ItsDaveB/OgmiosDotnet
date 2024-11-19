@@ -1,17 +1,11 @@
 using Corvus.Json;
+using Ogmios.Domain;
+
 
 namespace Ogmios.Services.ChainSynchronization;
 
 public class BlockService(IWebSocketService webSocketService) : IBlockService
 {
-    public class MirrorOptions
-    {
-        /// <summary>
-        /// A unique identifier sent with the request and expected to be mirrored by the server in the response.
-        /// </summary>
-        public string? Id { get; set; }
-    }
-
     public Task GetNextBlockAsync(Domain.InteractionContext context, MirrorOptions? options = null)
     {
         var nextBlockRequest = Generated.Ogmios.NextBlock.Create(jsonrpc: Generated.Ogmios.NextBlock.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.NextBlock.MethodEntity.EnumValues.NextBlock, id: options?.Id ?? string.Empty);

@@ -1,5 +1,4 @@
 using Ogmios.Domain;
-using static Ogmios.Services.ChainSynchronization.BlockService;
 
 namespace Ogmios.Services.ChainSynchronization;
 

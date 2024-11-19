@@ -6,9 +6,8 @@ using Ogmios.Domain;
 using Ogmios.Domain.Exceptions;
 using Ogmios.Services.ChainSynchronization;
 using static Generated.Ogmios.PointOrOrigin;
-using static Ogmios.Services.ChainSynchronization.BlockService;
 
-namespace Ogmios.Tests
+namespace Ogmios.Tests.ChainSynchronization
 {
     public class ChainSynchronizationClientServiceTests
     {

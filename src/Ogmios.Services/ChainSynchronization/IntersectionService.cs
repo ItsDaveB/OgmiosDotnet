@@ -2,7 +2,6 @@ using Corvus.Json;
 using Generated;
 using Ogmios.Domain;
 using Ogmios.Domain.Exceptions;
-using static Ogmios.Services.ChainSynchronization.BlockService;
 
 namespace Ogmios.Services.ChainSynchronization;
 
@@ -19,14 +18,14 @@ public class IntersectionService(IWebSocketService webSocketService) : IIntersec
                                                  paramsEntity: Generated.Ogmios.FindIntersection.ParamsEntity.Create([isFromOrigin ? (string)Origin.EnumValues.Origin.AsString : startingPoint]),
                                                  id: options?.Id ?? string.Empty);
 
-        var jsonResponse = await webSocketService.SendAndWaitForResponseAsync(findIntersectionRequest.AsJsonElement.ToString(), context.Socket);
-        var response = ParsedValue<Generated.Ogmios.FindIntersectionResponseEntity>.Parse(jsonResponse);
+        var responseMessage = await webSocketService.SendAndWaitForResponseAsync(findIntersectionRequest.AsJsonElement.ToString(), context.Socket);
+        var responseEntity = ParsedValue<Generated.Ogmios.FindIntersectionResponseEntity>.Parse(responseMessage).Instance;
 
-        if (!response.Instance.IsIntersectionFound)
+        if (!responseEntity.IsIntersectionFound)
         {
             throw new IntersectionNotFoundException("No intersection was found for the provided points.");
         }
 
-        return response.Instance.AsIntersectionFound;
+        return responseEntity.AsIntersectionFound;
     }
 }
