@@ -1,23 +1,23 @@
 # Memory Pool Monitoring
 
-Memory pool monitoring provides a robust mechanism for interacting with and analyzing the Cardano node's mempool. By acquiring snapshots, querying transactions, and utilizing consistent data handling, clients can effectively manage transactions in real-time while optimizing bandwidth and system resources.
+Memory pool monitoring enables real-time interaction and analysis of the Cardano node's mempool. It allows clients to acquire snapshots, query transactions, and manage system resources efficiently.
 
 ---
 
-## Overview
+## Key Operations
 
-The memory pool monitoring protocol facilitates the following key operations:
+1. **Acquire Mempool**: Use `AcquireMempoolAsync` to acquire a snapshot of the mempool. This ensures consistent data and prevents duplicate transaction processing.
 
-1. **Acquire Mempool Snapshot**: Clients must acquire a snapshot of the mempool to perform any subsequent queries. Once acquired, the snapshot ensures consistent data, preventing duplicate transactions in the same snapshot.
-2. **List Transactions**: Transactions in the mempool can be retrieved sequentially using `nextTransaction`, or checked for existence with `hasTransaction`.
+2. **List Transactions**:
 
-3. **Query Mempool Details**: The protocol also provides details about the mempool, such as:
+   - Retrieve transactions sequentially using `NextTransactionAsync`.
+   - Check if a specific transaction exists using `HasTransactionAsync`.
 
-   - Current size (in bytes).
-   - Number of transactions.
-   - Total capacity (defined by network parameters).
+3. **Query Mempool Details**: Fetch mempool size, number of transactions, and capacity using `SizeOfMempoolAsync`.
 
-4. **Retrieve Full Transactions**: Optionally, clients can request complete transaction data, including all details, instead of just transaction IDs.
+4. **Release Mempool**: Use `ReleaseMempoolAsync` to release the acquired snapshot and free up resources.
+
+5. **Shutdown**: Close the WebSocket connection gracefully using `ShutdownAsync`.
 
 ---
 
@@ -25,33 +25,39 @@ The memory pool monitoring protocol facilitates the following key operations:
 
 ### **Stateful Protocol**
 
-The mempool monitoring protocol maintains an explicit state managed by the client. Clients must acquire a snapshot to perform any actions. Subsequent queries, like `nextTransaction` or `sizeOfMempool`, operate on this snapshot, ensuring consistent results.
+Clients must acquire a snapshot using `AcquireMempoolAsync` before performing any queries. Operations like `HasTransactionAsync` and `SizeOfMempoolAsync` are tied to this snapshot.
 
-### **Transaction Queries**
+### **Snapshot Lifecycle**
 
-- **Sequential Listing**: Use `nextTransaction` repeatedly to retrieve all transactions in the snapshot.
-- **Specific Check**: Use `hasTransaction` to check for the presence of a specific transaction.
-
-### **Snapshot Acquisition**
-
-The `acquireMempool` operation blocks until a new snapshot becomes available. This eliminates the need for active polling and ensures clients only retrieve updated mempool states.
-
-### **Size and Capacity**
-
-The protocol provides information on:
-
-- Current mempool size (in bytes).
-- Number of transactions.
-- Capacity, which is dynamically defined (e.g., twice the block size).
+1. **Acquire**: Start by acquiring the snapshot (`AcquireMempoolAsync`).
+2. **Query**: Perform operations such as listing transactions or checking the mempool size.
+3. **Release**: Once done, release the snapshot (`ReleaseMempoolAsync`) to free resources.
 
 ---
 
-## Important Notes
+## Error Handling
 
-1. **Transaction Locality**: The protocol allows access to transactions submitted locally by the client or from peers in block-producing nodes.
-
-2. **Transaction Observability**: The protocol cannot guarantee observation of all transactions. Race conditions may result in missed transactions during snapshot updates.
-
-3. **Transaction Status**: The presence of a transaction in the mempool means it is pending, but its absence does not guarantee ledger inclusion. Transactions can be discarded or lost due to reorganization.
+1. **Must Acquire Mempool First**: Ensure a snapshot is acquired before operations like `HasTransactionAsync` or `SizeOfMempoolAsync`.
+2. **Transaction Not Found**: Validate the transaction ID if it’s missing from the mempool.
+3. **Timeouts**: Increase the timeout or verify network connectivity if operations take too long.
 
 ---
+
+## Summary of Methods
+
+| Method                 | Purpose                        | Notes                                   |
+| ---------------------- | ------------------------------ | --------------------------------------- |
+| `AcquireMempoolAsync`  | Acquire a mempool snapshot.    | Required for all subsequent operations. |
+| `HasTransactionAsync`  | Check if a transaction exists. | Operates on the acquired snapshot.      |
+| `NextTransactionAsync` | Retrieve the next transaction. | Processes sequentially.                 |
+| `SizeOfMempoolAsync`   | Get mempool size and capacity. | Requires an active snapshot.            |
+| `ReleaseMempoolAsync`  | Release the acquired snapshot. | Frees resources for other clients.      |
+| `ShutdownAsync`        | Gracefully close WebSocket.    | Ensure all queries are completed first. |
+
+---
+
+## Notes
+
+- **Transaction Locality**: Transactions from peers or local submissions may be visible.
+- **Transaction Observability**: Not all transactions are guaranteed to be observable due to race conditions.
+- **Transaction Status**: Presence in the mempool indicates pending status but does not guarantee inclusion in the ledger.
