@@ -1,3 +1,4 @@
+using Corvus.Json;
 using Ogmios.Domain;
 using Ogmios.Services.ChainSynchronization;
 using Ogmios.Services.InteractionContext;
@@ -31,17 +32,18 @@ namespace Ogmios.Example.Worker
                     contexts.Add(context);
                 }
 
-                await PerformChainSynchronizationOperations(contexts, ogmiosConfiguration, stoppingToken);
-                await PerformMemPoolMonitoringOperations(contexts, stoppingToken);
+                // Chain Synchronization. 
+                // var chainSynchronizationTask = PerformChainSynchronizationOperations(contexts, ogmiosConfiguration, stoppingToken);
+                // await chainSynchronizationTask;
 
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    await Task.Delay(100, stoppingToken);
-                }
+                // Memory Pool Monitoring.
+                // var memoryPoolMonitoringTask = PerformMemPoolMonitoringOperations(contexts, stoppingToken);
+                // await memoryPoolMonitoringTask;
+
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogInformation($"Worker cancellation requested. {ex.Message}");
+                _logger.LogInformation(ex, "Worker cancellation requested.");
             }
             catch (Exception ex)
             {
@@ -49,7 +51,7 @@ namespace Ogmios.Example.Worker
             }
             finally
             {
-                _logger.LogInformation("Worker stopping at: {time}", DateTimeOffset.Now);
+                _logger.LogInformation("Worker stopping at: {time}.", DateTimeOffset.Now);
             }
         }
 
@@ -60,11 +62,41 @@ namespace Ogmios.Example.Worker
 
         private async Task PerformMemPoolMonitoringOperations(List<InteractionContext> contexts, CancellationToken stoppingToken)
         {
-            var mempool = await _memoryPoolMonitoringService.AcquireMempoolAsync(contexts.First(), stoppingToken);
-            var sizeOfMempool = await _memoryPoolMonitoringService.SizeOfMempoolAsync(contexts.First(), stoppingToken);
-            var nextTransaction = await _memoryPoolMonitoringService.NextTransactionAsync(contexts.First(), stoppingToken);
-            var hasTransaction = await _memoryPoolMonitoringService.HasTransactionAsync(contexts.First(), "eddc4a21f5da916a3f8b0a8c1dc6cbeec790d058ce8ecb9390f326489768bbf1", stoppingToken);
-            var releaseMempool = await _memoryPoolMonitoringService.ReleaseMempoolAsync(contexts.First(), stoppingToken);
+            var context = contexts.FirstOrDefault();
+            if (context is null) return;
+
+            while (true)
+            {
+                Console.WriteLine("\u001b[33mWaiting for changes in the mempool snapshot...\u001b[0m");
+                var mempoolAcquired = await _memoryPoolMonitoringService.AcquireMempoolAsync(context, stoppingToken);
+                var mempoolSizeAndCapacity = await _memoryPoolMonitoringService.SizeOfMempoolAsync(context, stoppingToken);
+                Console.WriteLine($"\u001b[32mMempool maximum capacity (bytes): {mempoolSizeAndCapacity.MaxCapacity.Bytes}\u001b[0m");
+                Console.WriteLine($"\u001b[32mMempool current size (bytes): {mempoolSizeAndCapacity.CurrentSize.Bytes}\u001b[0m");
+
+                var nextTransaction = await _memoryPoolMonitoringService.NextTransactionAsync(context, stoppingToken);
+                if (nextTransaction.IsNullOrUndefined()) continue;
+
+                var nextTransactionEntity = nextTransaction.AsTransaction;
+                Console.WriteLine($"\u001b[32mTransactionId: {nextTransactionEntity.Id}\u001b[0m");
+                Console.WriteLine($"\u001b[32mTransactionFee: {nextTransactionEntity.Fee}\u001b[0m");
+                if (nextTransactionEntity.Metadata.IsNotNullOrUndefined())
+                {
+                    var formattedLabels = string.Join("\n", nextTransactionEntity.Metadata.Labels.Select(label => $"\u001b[32mKey:\n{label.Key}\nValue:\n{label.Value}\u001b[0m"));
+                    Console.WriteLine($"\u001b[32mTransactionMetadata:\n{formattedLabels}\u001b[0m");
+                }
+                Console.WriteLine($"\u001b[32mTransactionInputs: {nextTransactionEntity.Inputs.Count()}\u001b[0m");
+                Console.WriteLine($"\u001b[32mTransactionOutputs: {nextTransactionEntity.Outputs.Count()}\u001b[0m");
+
+                var hasTransaction = await _memoryPoolMonitoringService.HasTransactionAsync(context, "eddc4a21f5da916a3f8b0a8c1dc6cbeec790d058ce8ecb9390f326489768bbf1", stoppingToken);
+                Console.WriteLine($"\u001b[32mTransaction: eddc4a21f5da916a3f8b0a8c1dc6cbeec790d058ce8ecb9390f326489768bbf exists in snapshot?: {hasTransaction.Result}\u001b[0m");
+
+                if (stoppingToken.IsCancellationRequested)
+                {
+                    await _memoryPoolMonitoringService.ReleaseMempoolAsync(context, stoppingToken);
+                    await _memoryPoolMonitoringService.ShutdownAsync(context, stoppingToken);
+                    Console.ResetColor();
+                }
+            }
         }
     }
 }

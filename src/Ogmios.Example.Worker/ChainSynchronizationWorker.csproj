@@ -14,9 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-<!--   
-  <ProjectReference Include="..\Ogmios.Services\Ogmios.Services.csproj" />
-  <ProjectReference Include="..\Ogmios.Domain\Ogmios.Domain.csproj" />
- -->
+    <!-- <ProjectReference Include="..\Ogmios.Services\Ogmios.Services.csproj" />
+    <ProjectReference Include="..\Ogmios.Domain\Ogmios.Domain.csproj" /> -->
   </ItemGroup>
 </Project>

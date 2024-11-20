@@ -1,7 +1,7 @@
 using Generated;
 using Ogmios.Services.ChainSynchronization;
 
-namespace ChainSynchronizationWorker.ChainSynchronizationHandlers;
+namespace Ogmios.Example.Worker.ChainSynchronizationHandlers;
 
 public class ChainSynchronizationMessageHandlers : IChainSynchronizationMessageHandlers
 {
