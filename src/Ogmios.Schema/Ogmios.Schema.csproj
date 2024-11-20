@@ -19,7 +19,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Corvus.Json.ExtendedTypes" Version="4.0.0-preview.20" />
+    <PackageReference Include="Corvus.Json.ExtendedTypes" Version="4.0.10" />
   </ItemGroup>
 
 </Project>

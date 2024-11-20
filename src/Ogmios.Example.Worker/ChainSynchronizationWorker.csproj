@@ -8,14 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Corvus.Json.ExtendedTypes" Version="4.0.0-preview.20" />
+    <PackageReference Include="Corvus.Json.ExtendedTypes" Version="4.0.10" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NJsonSchema.CodeGeneration.CSharp" Version="11.0.2" />
+    <PackageReference Include="OgmiosDotnetClient.Services" Version="6.7.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ogmios.Services\Ogmios.Services.csproj" />
-    <ProjectReference Include="..\Ogmios.Domain\Ogmios.Domain.csproj" />
+<!--   
+  <ProjectReference Include="..\Ogmios.Services\Ogmios.Services.csproj" />
+  <ProjectReference Include="..\Ogmios.Domain\Ogmios.Domain.csproj" />
+ -->
   </ItemGroup>
 </Project>

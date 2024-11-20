@@ -26,7 +26,7 @@ To use **OgmiosDotnetClient**, you need:
 First, add the **OgmiosDotnetClient** package to your .NET project:
 
 ```bash
-dotnet add package OgmiosDotnetClient
+dotnet add package OgmiosDotnetClient.Services
 ```
 
 ### 2. Add Ogmios Services
