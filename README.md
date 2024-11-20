@@ -9,7 +9,7 @@
 This project is divided into the following modules:
 
 - [Chain Synchronization](src/Ogmios.Services/ChainSynchronization/docs/README.md): Covers the chain synchronization process, including real-time updates and blockchain data handling.
-- [Memory Pool Monitoring](src/Ogmios.Services/MemoryPoolMonitoring/README.md): Provides an overview of mempool monitoring for tracking transactions and querying mempool details.
+- [Memory Pool Monitoring](src/Ogmios.Services/MemoryPoolMonitoring/docs/README.md): Provides an overview of mempool monitoring for tracking transactions and querying mempool details.
 - [Ogmios Schema](src/Ogmios.Schema/docs/README.md): Contains the auto-generated strongly-typed C# classes based on the Ogmios JSON schema for the version in question.
 
 ## Requirements
