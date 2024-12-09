@@ -45,7 +45,7 @@ This report is intended for reviewers and the community.
 
 **Software:**
 
-- .NET SDK 8.0
+- .NET SDK 9.0
 - Moq Library for mocking.
 - xUnit Framework for testing.
 

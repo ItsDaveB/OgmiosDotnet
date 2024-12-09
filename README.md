@@ -11,6 +11,7 @@ This project is divided into the following modules:
 - [Chain Synchronization](src/Ogmios.Services/ChainSynchronization/docs/README.md): Covers the chain synchronization process, including real-time updates and blockchain data handling.
 - [Memory Pool Monitoring](src/Ogmios.Services/MemoryPoolMonitoring/docs/README.md): Provides an overview of mempool monitoring for tracking transactions and querying mempool details.
 - [Ogmios Schema](src/Ogmios.Schema/docs/README.md): Contains the auto-generated strongly-typed C# classes based on the Ogmios JSON schema for the version in question.
+- [Ogmios Worker Example](src/Ogmios.Example.Worker/docs/README.md): Demonstrates the capabilities of the Ogmios Client package through a fully functional worker application. This example showcases chain synchronization, mempool monitoring, and custom handler implementations, along with in-memory database operations for data persistence and flexibility.
 
 ## Requirements
 
@@ -42,7 +43,7 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddOgmiosServices();
 builder.Services.AddSingleton<IChainSynchronizationMessageHandlers, ChainSynchronizationMessageHandlers>();
-builder.Services.AddHostedService<ChainSynchronizationWorker>();
+builder.Services.AddHostedService<OgmiosWorker>();
 
 var host = builder.Build();
 host.Run();
@@ -50,18 +51,29 @@ host.Run();
 
 ### 3. Chain Synchronization Worker Example Application
 
-The `ChainSynchronizationWorker` is a background service that demonstrates how **OgmiosDotnetClient** operates. It functions as follows:
+The `OgmiosWorker` is a background service that demonstrates how **OgmiosDotnetClient** operates. It functions as follows:
 
 - **Initializes interaction contexts**: Sets up the necessary WebSocket connections to communicate with the Cardano node.
 - **Resumes blockchain synchronization**: Starts synchronizing from the last known point in the blockchain.
 - **Continuously listens for updates**: Monitors the Cardano node for real-time updates and processes new blocks as they are received.
 
-### Services Used by ChainSynchronizationWorker:
+### Services Used by OgmiosWorker:
 
 - **IInteractionContextFactory**: Responsible for establishing and managing WebSocket connections to the Cardano node.
-- **IChainSynchronizationClientService**: Handles the synchronization of blockchain data, ensuring that the latest blocks and chain state are processed.
+- **IChainSynchronizationClientService**: Handles the synchronization of blockchain data, ensuring that the latest blocks and chain state are processed based on the starting point configuration.
+- **IMemoryPoolMonitoringService**: Provides functionality to monitor and read memory pool transaction data.
 
-### 4. Configuration
+### 4. Saving Data to an In-Memory PostgreSQL Database
+
+The `OgmiosWorker` also demonstrates the use of **Entity Framework Core** with an **in-memory PostgreSQL database** to persist blockchain data, this implementation is siutated within the `Ogmios.Example.Database` project. This process leverages the following components:
+
+- **Entity Framework Core**: For defining the database context and managing persistence.
+- **AutoMapper**: To map the Ogmios JSON schema types to corresponding Entity Framework Core models.
+- **JSON Serialization**: Data is stored in the database as JSON for flexibility and simplicity.
+- **Validation of Mapping**: Data is read back from the database to ensure it can be accurately mapped back to schema-specific idiomatic types.
+  [Ogmios Worker Example](src/Ogmios.Example.Worker/docs/README.md):
+
+### 5. Configuration
 
 To properly configure **OgmiosDotnetClient** for blockchain synchronization, you need to specify starting points in your application's configuration file (e.g., `appsettings.json`). Each starting point represents a position on the blockchain from which the synchronization will begin, and **OgmiosDotnetClient** will treat each as a separate WebSocket connection.
 
@@ -81,13 +93,22 @@ To properly configure **OgmiosDotnetClient** for blockchain synchronization, you
 }
 ```
 
-### 5. Running the Worker
+### 6. Running the Worker
 
-Once everything is set up, run your application. The `ChainSynchronizationWorker` will handle the chain synchronization and process incoming blockchain updates.
+Once everything is set up, run your application. The `OgmiosWorker` will handle the chain synchronization and process incoming blockchain updates.
 
 ---
 
 This guide covers the basic steps needed to integrate **OgmiosDotnetClient** and start synchronizing Cardano blockchain data in your .NET application, whilst explaining the functionality and reasoning behind its design.
+
+#### Tips
+
+While this example uses an in-memory PostgreSQL database for demonstration purposes, Entity Framework Core supports a wide range of database providers (e.g., SQL Server, MySQL, SQLite). You can easily switch to a different provider by updating your application's dependency injection setup.
+
+```csharp
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseInMemoryDatabase("cardano"), ServiceLifetime.Singleton);
+```
 
 ### Useful Links
 
