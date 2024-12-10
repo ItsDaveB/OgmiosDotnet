@@ -13,7 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ogmios.Services", "src\Ogmi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ogmios.Tests", "src\Ogmios.Tests\Ogmios.Tests.csproj", "{160115BF-DFC0-4B88-86B7-B9CE0AA4C2FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ogmios.Example.Worker", "src\Ogmios.Example.Worker\ChainSynchronizationWorker.csproj", "{AC040E7D-8CDB-42C7-8A49-A6D817B28AAD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ogmios.Example.Worker", "src\Ogmios.Example.Worker\Ogmios.Example.Worker.csproj", "{AC040E7D-8CDB-42C7-8A49-A6D817B28AAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ogmios.Example.Database", "src\Ogmios.Example.Database\Ogmios.Example.Database.csproj", "{B0EA0405-540C-4BB2-8F23-730A636A0101}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ogmios.Example.Worker.Tests", "src\Ogmios.Example.Worker.Tests\Ogmios.Example.Worker.Tests.csproj", "{588565AB-66EC-445E-816A-3C8B51057004}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +45,14 @@ Global
 		{160115BF-DFC0-4B88-86B7-B9CE0AA4C2FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{160115BF-DFC0-4B88-86B7-B9CE0AA4C2FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{160115BF-DFC0-4B88-86B7-B9CE0AA4C2FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0EA0405-540C-4BB2-8F23-730A636A0101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0EA0405-540C-4BB2-8F23-730A636A0101}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0EA0405-540C-4BB2-8F23-730A636A0101}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0EA0405-540C-4BB2-8F23-730A636A0101}.Release|Any CPU.Build.0 = Release|Any CPU
+		{588565AB-66EC-445E-816A-3C8B51057004}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{588565AB-66EC-445E-816A-3C8B51057004}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{588565AB-66EC-445E-816A-3C8B51057004}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{588565AB-66EC-445E-816A-3C8B51057004}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +63,8 @@ Global
 		{AC040E7D-8CDB-42C7-8A49-A6D817B28AAD} = {A9B062E5-986A-4238-89D1-7922E43319A0}
 		{012B91A5-F3D0-4D00-9AC5-493862E568EA} = {A9B062E5-986A-4238-89D1-7922E43319A0}
 		{160115BF-DFC0-4B88-86B7-B9CE0AA4C2FB} = {A9B062E5-986A-4238-89D1-7922E43319A0}
+		{B0EA0405-540C-4BB2-8F23-730A636A0101} = {A9B062E5-986A-4238-89D1-7922E43319A0}
+		{588565AB-66EC-445E-816A-3C8B51057004} = {A9B062E5-986A-4238-89D1-7922E43319A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2277F8FE-3D3A-42F3-BC63-FDD0EF2D64CB}

@@ -11,7 +11,6 @@ namespace Ogmios.Services.ChainSynchronization
         private readonly IChainSynchronizationMessageHandlers _messageHandlers = messageHandlers ?? throw new ArgumentNullException(nameof(messageHandlers));
         private readonly IIntersectionService _intersectionService = intersectionService ?? throw new ArgumentNullException(nameof(intersectionService));
         private readonly IBlockService _blockService = blockService ?? throw new ArgumentNullException(nameof(blockService));
-        private readonly Dictionary<Guid, DateTime> _requestTimestamps = [];
         private readonly SemaphoreSlim _rateLimiter = new(1, 1);
 
         public async Task ResumeListeningAsync(Domain.InteractionContext interactionContext, CancellationToken cancellationToken)
@@ -130,8 +129,6 @@ namespace Ogmios.Services.ChainSynchronization
             try
             {
                 var requestId = Guid.NewGuid();
-                _requestTimestamps[requestId] = DateTime.UtcNow;
-
                 await _blockService.GetNextBlockAsync(interactionContext, new MirrorOptions { Id = requestId.ToString() });
             }
             catch (Exception ex)

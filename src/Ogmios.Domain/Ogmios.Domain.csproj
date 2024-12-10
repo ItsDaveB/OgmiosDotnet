@@ -1,10 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Ogmios.Domain</RootNamespace>
+
+   <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>6.7.1</Version>
+    <Authors>Dave B</Authors>
+    <PackageId>OgmiosDotnetClient.Domain</PackageId>
+    <Description>Domain core for OgmiosDotnetClient.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression> 
+    <RepositoryUrl>https://github.com/ItsDaveB/OgmiosDotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Ogmios;Blockchain;Cardano</PackageTags>
   </PropertyGroup>
 
 </Project>
