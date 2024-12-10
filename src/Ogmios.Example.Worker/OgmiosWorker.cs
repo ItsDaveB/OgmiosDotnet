@@ -35,12 +35,12 @@ namespace Ogmios.Example.Worker
                 }
 
                 // Chain Synchronization. 
-                var chainSynchronizationTask = PerformChainSynchronizationOperations(contexts, ogmiosConfiguration, stoppingToken);
-                await chainSynchronizationTask;
+                // var chainSynchronizationTask = PerformChainSynchronizationOperations(contexts, ogmiosConfiguration, stoppingToken);
+                // await chainSynchronizationTask;
 
                 // Memory Pool Monitoring.
-                // var memoryPoolMonitoringTask = PerformMemPoolMonitoringOperations(contexts, stoppingToken);
-                // await memoryPoolMonitoringTask;
+                var memoryPoolMonitoringTask = PerformMemPoolMonitoringOperations(contexts, stoppingToken);
+                await memoryPoolMonitoringTask;
 
             }
             catch (OperationCanceledException ex)

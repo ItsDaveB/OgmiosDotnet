@@ -5,19 +5,20 @@ namespace Ogmios.Example.Database.Infrastructure.Database.Repositories
 {
     public class TransactionRepository(ApplicationDbContext context) : ITransactionRepository
     {
-        private readonly ApplicationDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
+        private readonly ApplicationDbContext _context =
+            context ?? throw new ArgumentNullException(nameof(context));
 
         public async Task AddTransactionAsync(Transaction transaction)
         {
             var doesExist = await GetTransactionByIdAsync(transaction.Id);
-            if (doesExist is not null) return;
+            if (doesExist is not null)
+                return;
 
             await _context.Transactions.AddAsync(transaction);
             await _context.SaveChangesAsync();
 
             Console.WriteLine("Transactions Saved:" + _context.Transactions.Count());
         }
-
 
         public async Task<Transaction?> GetTransactionByIdAsync(string transactionId)
         {
@@ -46,6 +47,7 @@ namespace Ogmios.Example.Database.Infrastructure.Database.Repositories
         {
             var transaction = await _context.Transactions.FindAsync(id) ?? throw new KeyNotFoundException($"Transaction with ID {id} not found.");
             _context.Transactions.Remove(transaction);
+
             await _context.SaveChangesAsync();
         }
     }
