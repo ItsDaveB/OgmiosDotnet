@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Ogmios.Services</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>6.7.0</Version>
+    <Version>6.7.1</Version>
     <Authors>Dave B</Authors>
     <PackageId>OgmiosDotnetClient.Services</PackageId>
     <Description>A set of services and extensions for integrating Ogmios functionality, including chain synchronization, memory pool monitoring, and server health monitoring.</Description>
