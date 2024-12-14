@@ -103,4 +103,4 @@ The project is licensed under the permissive [MIT License](https://github.com/It
 
 ## Link to Close-out Video
 
-[YouTube/Vimeo Link](#)
+[YouTube Link](https://youtu.be/l9oBGdg7iKs?feature=shared) 
