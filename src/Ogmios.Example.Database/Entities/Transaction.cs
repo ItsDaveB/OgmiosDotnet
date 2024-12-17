@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Corvus.Json;
 
@@ -134,7 +133,7 @@ public class Transaction
     public Generated.Transaction.TransactionOutputArray? Outputs
     {
         get;
-        set => field = value?.HasDotnetBacking == false || value?.ValueKind == JsonValueKind.Undefined ? null : value;
+        set => field = value.GetValueOrDefault() == default ? null : value;
     }
 
     /// <summary>
@@ -145,7 +144,7 @@ public class Transaction
     public Generated.Transaction.GovernanceProposalArray? Proposals
     {
         get;
-        set => field = value?.HasDotnetBacking == false || value?.ValueKind == JsonValueKind.Undefined ? null : value;
+        set => field = value.GetValueOrDefault() == default ? null : value;
     }
 
     /// <summary>
