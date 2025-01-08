@@ -14,8 +14,8 @@ public class IntersectionService(IWebSocketService webSocketService) : IIntersec
                                                                         slot: Slot.ParseValue(point?.StartingPointSlot.ToString() ?? string.Empty));
 
         var findIntersectionRequest =
-        Generated.Ogmios.FindIntersection.Create(jsonrpc: Generated.Ogmios.FindIntersection.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.FindIntersection.MethodEntity.EnumValues.FindIntersection,
-                                                 paramsEntity: Generated.Ogmios.FindIntersection.ParamsEntity.Create([isFromOrigin ? (string)Origin.EnumValues.Origin.AsString : startingPoint]),
+        Generated.Ogmios.FindIntersection.Create(jsonrpc: Generated.Ogmios.FindIntersection.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.FindIntersection.MethodEntity.EnumValues.FindIntersection,
+                                                 paramsValue: Generated.Ogmios.FindIntersection.ParamsEntity.Create([isFromOrigin ? (string)Origin.EnumValues.Origin.AsString : startingPoint]),
                                                  id: options?.Id ?? string.Empty);
 
         var responseMessage = await webSocketService.SendAndWaitForResponseAsync(findIntersectionRequest.AsJsonElement.ToString(), context.Socket);
