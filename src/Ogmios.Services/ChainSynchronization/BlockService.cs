@@ -8,7 +8,7 @@ public class BlockService(IWebSocketService webSocketService) : IBlockService
 {
     public Task GetNextBlockAsync(Domain.InteractionContext context, MirrorOptions? options = null)
     {
-        var nextBlockRequest = Generated.Ogmios.NextBlock.Create(jsonrpc: Generated.Ogmios.NextBlock.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.NextBlock.MethodEntity.EnumValues.NextBlock, id: options?.Id ?? string.Empty);
+        var nextBlockRequest = Generated.Ogmios.NextBlock.Create(jsonrpc: Generated.Ogmios.NextBlock.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.NextBlock.MethodEntity.EnumValues.NextBlock, id: options?.Id ?? string.Empty);
         return webSocketService.SendMessageAsync(nextBlockRequest.AsJsonElement.ToString(), context.Socket);
     }
 

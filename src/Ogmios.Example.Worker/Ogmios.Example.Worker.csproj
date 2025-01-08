@@ -10,12 +10,12 @@
 
   <ItemGroup>
     <PackageReference Include="automapper" Version="13.0.1" />
-    <PackageReference Include="Corvus.Json.ExtendedTypes" Version="4.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.2" />
+    <PackageReference Include="Corvus.Json.ExtendedTypes" Version="4.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
     <!-- <PackageReference Include="OgmiosDotnetClient.Services" Version="6.7.0" /> -->
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
