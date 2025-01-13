@@ -66,7 +66,7 @@ public class MempoolMonitoringClientTests
 
         var mockWebSocketService = new Mock<IWebSocketService>();
 
-        var validResponseJson = Generated.Ogmios.AcquireMempoolResponse.Create(jsonrpc: Generated.Ogmios.AcquireMempoolResponse.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.AcquireMempoolResponse.MethodEntity.EnumValues.AcquireMempool, result: Generated.Ogmios.AcquireMempoolResponse.RequiredAcquiredAndSlot.Create(acquired: Generated.Ogmios.AcquireMempoolResponse.RequiredAcquiredAndSlot.AcquiredEntity.EnumValues.Mempool, slot: Generated.Slot.ParseValue(slot)));
+        var validResponseJson = Generated.Ogmios.AcquireMempoolResponse.Create(jsonrpc: Generated.Ogmios.AcquireMempoolResponse.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.AcquireMempoolResponse.MethodEntity.EnumValues.AcquireMempool, result: Generated.Ogmios.AcquireMempoolResponse.RequiredAcquiredAndSlot.Create(acquired: Generated.Ogmios.AcquireMempoolResponse.RequiredAcquiredAndSlot.AcquiredEntity.EnumValues.Mempool, slot: Generated.Slot.ParseValue(slot)));
         mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(
                 It.IsAny<string>(),
                 It.IsAny<IClientWebSocket>(),
@@ -92,7 +92,7 @@ public class MempoolMonitoringClientTests
         var mockWebSocketService = new Mock<IWebSocketService>();
         var service = new MemoryPoolMonitoringService(mockWebSocketService.Object);
 
-        var hasTransactionResponseJson = Generated.Ogmios.HasTransactionResponseEntity.HasTransactionResponse.Create(jsonrpc: Generated.Ogmios.HasTransactionResponseEntity.HasTransactionResponse.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.HasTransactionResponseEntity.HasTransactionResponse.MethodEntity.EnumValues.HasTransaction, result: false);
+        var hasTransactionResponseJson = Generated.Ogmios.HasTransactionResponseEntity.HasTransactionResponse.Create(jsonrpc: Generated.Ogmios.HasTransactionResponseEntity.HasTransactionResponse.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.HasTransactionResponseEntity.HasTransactionResponse.MethodEntity.EnumValues.HasTransaction, result: false);
         mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(
                      It.IsAny<string>(),
                      It.IsAny<IClientWebSocket>(),
@@ -117,7 +117,7 @@ public class MempoolMonitoringClientTests
         var service = new MemoryPoolMonitoringService(mockWebSocketService.Object);
 
 
-        var hasTransactionResponseJson = Generated.Ogmios.MustAcquireMempoolFirst.Create(error: Generated.Ogmios.MustAcquireMempoolFirst.MustAcquireAMempoolSnapshotPriorToPerformingAnyQuery.Create(code: 4000, message: "You must acquire a mempool snapshot prior to accessing it."), jsonrpc: Generated.Ogmios.MustAcquireMempoolFirst.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.MustAcquireMempoolFirst.MethodEntity.EnumValues.HasTransaction);
+        var hasTransactionResponseJson = Generated.Ogmios.MustAcquireMempoolFirst.Create(error: Generated.Ogmios.MustAcquireMempoolFirst.MustAcquireAMempoolSnapshotPriorToPerformingAnyQuery.Create(code: 4000, message: "You must acquire a mempool snapshot prior to accessing it."), jsonrpc: Generated.Ogmios.MustAcquireMempoolFirst.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.MustAcquireMempoolFirst.MethodEntity.EnumValues.HasTransaction);
         mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(
                      It.IsAny<string>(),
                      It.IsAny<IClientWebSocket>(),
@@ -138,7 +138,7 @@ public class MempoolMonitoringClientTests
         var mockWebSocketService = new Mock<IWebSocketService>();
 
         var nextTransactionResponseJson = Generated.Ogmios.NextTransactionResponseEntity.NextTransactionResponse.Create(
-            jsonrpc: Generated.Ogmios.NextTransactionResponseEntity.NextTransactionResponse.JsonrpcEntity.EnumValues.V20,
+            jsonrpc: Generated.Ogmios.NextTransactionResponseEntity.NextTransactionResponse.JsonrpcEntity.EnumValues.Value20,
             method: Generated.Ogmios.NextTransactionResponseEntity.NextTransactionResponse.MethodEntity.EnumValues.NextTransaction,
             result: Generated.Ogmios.NextTransactionResponseEntity.NextTransactionResponse.RequiredTransaction.Null
         );
@@ -172,7 +172,7 @@ public class MempoolMonitoringClientTests
                 code: 4000,
                 message: "You must acquire a mempool snapshot prior to accessing it."
             ),
-            jsonrpc: Generated.Ogmios.MustAcquireMempoolFirst.JsonrpcEntity.EnumValues.V20,
+            jsonrpc: Generated.Ogmios.MustAcquireMempoolFirst.JsonrpcEntity.EnumValues.Value20,
             method: Generated.Ogmios.MustAcquireMempoolFirst.MethodEntity.EnumValues.NextTransaction
         );
         mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(
@@ -198,7 +198,7 @@ public class MempoolMonitoringClientTests
         var mockWebSocketService = new Mock<IWebSocketService>();
 
         var mempoolSizeResponseJson = Generated.Ogmios.SizeOfMempoolResponseEntity.SizeOfMempoolResponse.Create(
-            jsonrpc: Generated.Ogmios.SizeOfMempoolResponseEntity.SizeOfMempoolResponse.JsonrpcEntity.EnumValues.V20,
+            jsonrpc: Generated.Ogmios.SizeOfMempoolResponseEntity.SizeOfMempoolResponse.JsonrpcEntity.EnumValues.Value20,
             method: Generated.Ogmios.SizeOfMempoolResponseEntity.SizeOfMempoolResponse.MethodEntity.EnumValues.SizeOfMempool,
             result: Generated.Ogmios.MempoolSizeAndCapacity.Create(currentSize: Generated.NumberOfBytes.Create(0), maxCapacity: Generated.NumberOfBytes.Create(1000000), transactions: Generated.Ogmios.MempoolSizeAndCapacity.RequiredCountEntity.Create(Generated.UInt32.ParseValue("5")))
         );
@@ -234,7 +234,7 @@ public class MempoolMonitoringClientTests
                 code: 4000,
                 message: "You must acquire a mempool snapshot prior to accessing it."
             ),
-            jsonrpc: Generated.Ogmios.MustAcquireMempoolFirst.JsonrpcEntity.EnumValues.V20,
+            jsonrpc: Generated.Ogmios.MustAcquireMempoolFirst.JsonrpcEntity.EnumValues.Value20,
             method: Generated.Ogmios.MustAcquireMempoolFirst.MethodEntity.EnumValues.SizeOfMempool
         );
         mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(

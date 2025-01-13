@@ -10,7 +10,7 @@ public class MemoryPoolMonitoringService(IWebSocketService webSocketService) : I
 {
     public async Task<Generated.Ogmios.AcquireMempoolResponse.RequiredAcquiredAndSlot> AcquireMempoolAsync(Domain.InteractionContext context, CancellationToken cancellationToken, MirrorOptions? mirrorOptions = default)
     {
-        var acquireMempoolRequest = Generated.Ogmios.AcquireMempool.Create(jsonrpc: Generated.Ogmios.AcquireMempool.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.AcquireMempool.MethodEntity.EnumValues.AcquireMempool, id: mirrorOptions?.Id ?? string.Empty);
+        var acquireMempoolRequest = Generated.Ogmios.AcquireMempool.Create(jsonrpc: Generated.Ogmios.AcquireMempool.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.AcquireMempool.MethodEntity.EnumValues.AcquireMempool, id: mirrorOptions?.Id ?? string.Empty);
         var message = acquireMempoolRequest.AsJsonElement.ToString();
         var responseMessage = await webSocketService.SendAndWaitForResponseAsync(message, context.Socket, timeoutMilliseconds: default, cancellationToken);
 
@@ -27,7 +27,7 @@ public class MemoryPoolMonitoringService(IWebSocketService webSocketService) : I
     public async Task<Generated.Ogmios.HasTransactionResponseEntity.HasTransactionResponse> HasTransactionAsync(Domain.InteractionContext context, string transactionId, CancellationToken cancellationToken, MirrorOptions? mirrorOptions = default)
     {
         var transactionIdEntity = TransactionId.FromAny(transactionId);
-        var hasTransactionRequest = Generated.Ogmios.HasTransaction.Create(jsonrpc: Generated.Ogmios.HasTransaction.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.HasTransaction.MethodEntity.EnumValues.HasTransaction,
+        var hasTransactionRequest = Generated.Ogmios.HasTransaction.Create(jsonrpc: Generated.Ogmios.HasTransaction.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.HasTransaction.MethodEntity.EnumValues.HasTransaction,
                                                                            Generated.Ogmios.HasTransaction.RequiredId.Create(transactionIdEntity), id: mirrorOptions?.Id ?? string.Empty);
         var message = hasTransactionRequest.AsJsonElement.ToString();
         var responseMessage = await webSocketService.SendAndWaitForResponseAsync(message, context.Socket, timeoutMilliseconds: default, cancellationToken) ?? throw new InvalidOperationException("The response message is null.");
@@ -44,8 +44,8 @@ public class MemoryPoolMonitoringService(IWebSocketService webSocketService) : I
 
     public async Task<Generated.Ogmios.NextTransactionResponseEntity.NextTransactionResponse.RequiredTransaction.TransactionEntity> NextTransactionAsync(Domain.InteractionContext context, CancellationToken cancellationToken, MirrorOptions? mirrorOptions = default)
     {
-        var nextTransactionRequest = Generated.Ogmios.NextTransaction.Create(jsonrpc: Generated.Ogmios.NextTransaction.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.NextTransaction.MethodEntity.EnumValues.NextTransaction,
-                                                                             id: mirrorOptions?.Id ?? string.Empty, paramsEntity: Generated.Ogmios.NextTransaction.ParamsEntity.Create(Generated.Ogmios.NextTransaction.ParamsEntity.FieldsEntity.EnumValues.All));
+        var nextTransactionRequest = Generated.Ogmios.NextTransaction.Create(jsonrpc: Generated.Ogmios.NextTransaction.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.NextTransaction.MethodEntity.EnumValues.NextTransaction,
+                                                                             id: mirrorOptions?.Id ?? string.Empty, paramsValue: Generated.Ogmios.NextTransaction.ParamsEntity.Create(Generated.Ogmios.NextTransaction.ParamsEntity.FieldsEntity.EnumValues.All));
         var message = nextTransactionRequest.AsJsonElement.ToString();
         var responseMessage = await webSocketService.SendAndWaitForResponseAsync(message, context.Socket, timeoutMilliseconds: default, cancellationToken);
 
@@ -62,7 +62,7 @@ public class MemoryPoolMonitoringService(IWebSocketService webSocketService) : I
 
     public async Task<Generated.Ogmios.MempoolSizeAndCapacity> SizeOfMempoolAsync(Domain.InteractionContext context, CancellationToken cancellationToken, MirrorOptions? mirrorOptions = default)
     {
-        var sizeOfMempoolRequest = Generated.Ogmios.SizeOfMempool.Create(jsonrpc: Generated.Ogmios.SizeOfMempool.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.SizeOfMempool.MethodEntity.EnumValues.SizeOfMempool, id: mirrorOptions?.Id ?? string.Empty);
+        var sizeOfMempoolRequest = Generated.Ogmios.SizeOfMempool.Create(jsonrpc: Generated.Ogmios.SizeOfMempool.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.SizeOfMempool.MethodEntity.EnumValues.SizeOfMempool, id: mirrorOptions?.Id ?? string.Empty);
         var message = sizeOfMempoolRequest.AsJsonElement.ToString();
         var responseMessage = await webSocketService.SendAndWaitForResponseAsync(message, context.Socket, timeoutMilliseconds: default, cancellationToken);
 
@@ -79,7 +79,7 @@ public class MemoryPoolMonitoringService(IWebSocketService webSocketService) : I
 
     public async Task<Generated.Ogmios.ReleaseMempoolResponseEntity.ReleaseMempoolResponse.RequiredReleased> ReleaseMempoolAsync(Domain.InteractionContext context, CancellationToken cancellationToken, MirrorOptions? mirrorOptions = default)
     {
-        var releaseMempoolRequest = Generated.Ogmios.ReleaseMempool.Create(jsonrpc: Generated.Ogmios.ReleaseMempool.JsonrpcEntity.EnumValues.V20, method: Generated.Ogmios.ReleaseMempool.MethodEntity.EnumValues.ReleaseMempool, id: mirrorOptions?.Id ?? string.Empty);
+        var releaseMempoolRequest = Generated.Ogmios.ReleaseMempool.Create(jsonrpc: Generated.Ogmios.ReleaseMempool.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.ReleaseMempool.MethodEntity.EnumValues.ReleaseMempool, id: mirrorOptions?.Id ?? string.Empty);
         var message = releaseMempoolRequest.AsJsonElement.ToString();
         var responseMessage = await webSocketService.SendAndWaitForResponseAsync(message, context.Socket, timeoutMilliseconds: default, cancellationToken);
 

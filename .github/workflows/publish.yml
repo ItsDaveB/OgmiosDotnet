@@ -25,10 +25,10 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: Pack Ogmios.Services
-        run: dotnet pack ./Ogmios.Services/Ogmios.Services.csproj --configuration Release --output ./nupkg
+        run: dotnet pack ./src/Ogmios.Services/Ogmios.Services.csproj --configuration Release --output ./nupkg
 
       - name: Pack Ogmios.Schema
-        run: dotnet pack ./Ogmios.Schema/Ogmios.Schema.csproj --configuration Release --output ./nupkg
+        run: dotnet pack ./src/Ogmios.Schema/Ogmios.Schema.csproj --configuration Release --output ./nupkg
 
       - name: Publish to NuGet
         env:
