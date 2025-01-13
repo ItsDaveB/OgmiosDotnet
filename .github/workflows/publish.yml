@@ -24,6 +24,9 @@ jobs:
       - name: Build the project
         run: dotnet build --configuration Release
 
+      - name: Pack Ogmios.Domain
+        run: dotnet pack ./src/Ogmios.Domain/Ogmios.Domain.csproj --configuration Release --output ./nupkg
+
       - name: Pack Ogmios.Services
         run: dotnet pack ./src/Ogmios.Services/Ogmios.Services.csproj --configuration Release --output ./nupkg
 
