@@ -15,12 +15,12 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
     <PackageReference Include="OgmiosDotnetClient.Services" Version="6.10.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ogmios.Services\Ogmios.Services.csproj" />
-    <ProjectReference Include="..\Ogmios.Domain\Ogmios.Domain.csproj" />
+    <!-- <ProjectReference Include="..\Ogmios.Services\Ogmios.Services.csproj" />
+    <ProjectReference Include="..\Ogmios.Domain\Ogmios.Domain.csproj" /> -->
     <ProjectReference Include="..\Ogmios.Example.Database\Ogmios.Example.Database.csproj" />
   </ItemGroup>
 </Project>
