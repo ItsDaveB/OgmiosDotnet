@@ -13,7 +13,7 @@ public class InteractionContextFactory(IWebSocketService webSocketService, IServ
             throw new ArgumentException("Ogmios Host configuration is missing or empty.");
         }
 
-        var config = new ConnectionConfig { Host = ogmiosConfiguration.Host, Port = ogmiosConfiguration.Port };
+        var config = new ConnectionConfig { Host = ogmiosConfiguration.Host, Port = ogmiosConfiguration.Port, Tls = ogmiosConfiguration.Tls };
         var service = new InteractionContextService(webSocketService, serverHealthService);
 
         return service.CreateInteractionContextAsync(connectionName, startingPoint, config);

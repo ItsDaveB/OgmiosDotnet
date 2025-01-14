@@ -5,5 +5,6 @@ namespace Ogmios.Domain
         public string Host { get; set; } = string.Empty;
         public int Port { get; set; }
         public int MaxBlocksPerSecond { get; set; } = 100;
+        public bool Tls { get; set; } = true;
     }
 }
