@@ -46,7 +46,7 @@ public readonly partial struct GovernanceVoter
                         result = result.UsingStack();
                     }
 
-                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/GovernanceVoter/oneOf/2/properties/role");
+                    result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/GovernanceVoter/oneOf/2/properties/role");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;

@@ -69,7 +69,7 @@ public readonly partial struct StakePoolVotingThresholds
         /// <summary>
         /// Gets the schema location from which this type was generated.
         /// </summary>
-        public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/StakePoolVotingThresholds/properties/constitutionalCommittee";
+        public static string SchemaLocation { get; } = "OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/StakePoolVotingThresholds/properties/constitutionalCommittee";
 
         /// <summary>
         /// Gets a Null instance.

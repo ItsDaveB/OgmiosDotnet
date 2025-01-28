@@ -35,7 +35,7 @@ public readonly partial struct InputSource
                 result = result.UsingStack();
             }
 
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/InputSource");
+            result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/InputSource");
         }
 
         JsonValueKind valueKind = this.ValueKind;

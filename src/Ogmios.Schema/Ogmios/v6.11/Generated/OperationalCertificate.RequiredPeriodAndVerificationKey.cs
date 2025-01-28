@@ -74,7 +74,7 @@ public readonly partial struct OperationalCertificate
         /// <summary>
         /// Gets the schema location from which this type was generated.
         /// </summary>
-        public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/OperationalCertificate/properties/kes";
+        public static string SchemaLocation { get; } = "OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/OperationalCertificate/properties/kes";
 
         /// <summary>
         /// Gets a Null instance.

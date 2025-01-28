@@ -35,7 +35,7 @@ public readonly partial struct ValidityInterval
                 result = result.UsingStack();
             }
 
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/ValidityInterval");
+            result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/ValidityInterval");
         }
 
         JsonValueKind valueKind = this.ValueKind;

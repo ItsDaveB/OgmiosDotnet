@@ -41,7 +41,7 @@ public readonly partial struct StakePoolVotingThresholds
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/StakePoolVotingThresholds/properties/constitutionalCommittee");
+                result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/StakePoolVotingThresholds/properties/constitutionalCommittee");
             }
 
             JsonValueKind valueKind = this.ValueKind;

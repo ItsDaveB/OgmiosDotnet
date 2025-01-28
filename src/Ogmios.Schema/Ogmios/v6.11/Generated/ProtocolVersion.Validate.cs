@@ -35,7 +35,7 @@ public readonly partial struct ProtocolVersion
                 result = result.UsingStack();
             }
 
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/ProtocolVersion");
+            result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/ProtocolVersion");
         }
 
         JsonValueKind valueKind = this.ValueKind;

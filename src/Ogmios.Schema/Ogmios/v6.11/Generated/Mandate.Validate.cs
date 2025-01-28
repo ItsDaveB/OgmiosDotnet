@@ -35,7 +35,7 @@ public readonly partial struct Mandate
                 result = result.UsingStack();
             }
 
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/Mandate");
+            result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/Mandate");
         }
 
         JsonValueKind valueKind = this.ValueKind;

@@ -61,7 +61,7 @@ public readonly partial struct Ogmios
                                     result = result.UsingStack();
                                 }
 
-                                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/ogmios.json#/properties/QueryLedgerStateConstitutionalCommitteeResponse/oneOf/0/properties/result/oneOf/1/properties/quorum");
+                                result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/ogmios.json#/properties/QueryLedgerStateConstitutionalCommitteeResponse/oneOf/0/properties/result/oneOf/1/properties/quorum");
                             }
 
                             result = CorvusValidation.CompositionOneOfValidationHandler(this, result, level);

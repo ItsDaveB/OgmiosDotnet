@@ -73,7 +73,7 @@ public readonly partial struct GenesisConway
         /// <summary>
         /// Gets the schema location from which this type was generated.
         /// </summary>
-        public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/Genesis<Conway>/properties/era";
+        public static string SchemaLocation { get; } = "OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/Genesis<Conway>/properties/era";
 
         /// <summary>
         /// Gets a Null instance.

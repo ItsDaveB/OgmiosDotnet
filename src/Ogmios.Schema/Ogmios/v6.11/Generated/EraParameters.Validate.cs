@@ -40,7 +40,7 @@ public readonly partial struct EraParameters
                 result = result.UsingStack();
             }
 
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/EraParameters");
+            result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/EraParameters");
         }
 
         JsonValueKind valueKind = this.ValueKind;

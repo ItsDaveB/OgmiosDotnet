@@ -51,7 +51,7 @@ public readonly partial struct Certificate
                         result = result.UsingStack();
                     }
 
-                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/Certificate/oneOf/0/properties/stakePool");
+                    result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/Certificate/oneOf/0/properties/stakePool");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;

@@ -69,7 +69,7 @@ public readonly partial struct DelegateRepresentative
         /// <summary>
         /// Gets the schema location from which this type was generated.
         /// </summary>
-        public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/DelegateRepresentative/oneOf/0";
+        public static string SchemaLocation { get; } = "OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/DelegateRepresentative/oneOf/0";
 
         /// <summary>
         /// Gets a Null instance.

@@ -35,7 +35,7 @@ public readonly partial struct BlockBft
                 result = result.UsingStack();
             }
 
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/Block<BFT>");
+            result = result.PushSchemaLocation("gOgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/Block<BFT>");
         }
 
         JsonValueKind valueKind = this.ValueKind;

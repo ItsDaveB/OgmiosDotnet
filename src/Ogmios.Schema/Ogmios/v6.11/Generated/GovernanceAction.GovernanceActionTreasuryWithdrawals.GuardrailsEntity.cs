@@ -79,7 +79,7 @@ public readonly partial struct GovernanceAction
             /// <summary>
             /// Gets the schema location from which this type was generated.
             /// </summary>
-            public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/GovernanceAction/oneOf/3/properties/guardrails";
+            public static string SchemaLocation { get; } = "OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/GovernanceAction/oneOf/3/properties/guardrails";
 
             /// <summary>
             /// Gets a Null instance.

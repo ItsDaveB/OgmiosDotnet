@@ -46,7 +46,7 @@ public readonly partial struct BootstrapOperationalCertificate
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/BootstrapOperationalCertificate/properties/delegate");
+                result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/BootstrapOperationalCertificate/properties/delegate");
             }
 
             JsonValueKind valueKind = this.ValueKind;

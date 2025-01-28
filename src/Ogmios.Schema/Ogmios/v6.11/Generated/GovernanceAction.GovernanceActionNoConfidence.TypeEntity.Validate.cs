@@ -51,7 +51,7 @@ public readonly partial struct GovernanceAction
                         result = result.UsingStack();
                     }
 
-                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/GovernanceAction/oneOf/6/properties/type");
+                    result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/GovernanceAction/oneOf/6/properties/type");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;

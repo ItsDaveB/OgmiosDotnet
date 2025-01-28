@@ -46,7 +46,7 @@ public readonly partial struct GenesisConway
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/Genesis<Conway>/properties/constitutionalCommittee");
+                result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/Genesis<Conway>/properties/constitutionalCommittee");
             }
 
             JsonValueKind valueKind = this.ValueKind;

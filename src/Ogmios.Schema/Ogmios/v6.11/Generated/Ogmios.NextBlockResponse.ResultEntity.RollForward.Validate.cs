@@ -56,7 +56,7 @@ public readonly partial struct Ogmios
                             result = result.UsingStack();
                         }
 
-                        result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/ogmios.json#/properties/NextBlockResponse/properties/result/oneOf/0");
+                        result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/ogmios.json#/properties/NextBlockResponse/properties/result/oneOf/0");
                     }
 
                     JsonValueKind valueKind = this.ValueKind;

@@ -83,7 +83,7 @@ public readonly partial struct ConstitutionalCommitteeMember
                 /// <summary>
                 /// Gets the schema location from which this type was generated.
                 /// </summary>
-                public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/ConstitutionalCommitteeMember/properties/next/oneOf/2/properties/change";
+                public static string SchemaLocation { get; } = "OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.11/Source/cardano.json#/definitions/ConstitutionalCommitteeMember/properties/next/oneOf/2/properties/change";
 
                 /// <summary>
                 /// Gets a Null instance.
