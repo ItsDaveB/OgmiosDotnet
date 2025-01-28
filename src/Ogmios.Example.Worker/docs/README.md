@@ -46,7 +46,8 @@ This application is open-source and designed for easy cloning, use, and extensio
      ```json
      "Ogmios": {
        "Host": "https://demeter-run-authenticated-url",
-       "Port": "443",
+       "Port": 443,
+       "Tls": true,
        "MaxBlocksPerSecond": "35"
      }
      ```

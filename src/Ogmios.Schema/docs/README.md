@@ -34,8 +34,8 @@ dotnet tool install --global Corvus.Json.JsonSchema.TypeGeneratorTool
 
 ## Usage
 
-To generate the .NET types from the `ogmios.json` schema file, run the following command in your terminal under the correct version.
+To generate the .NET types from the `ogmios.json` schema file, run the following command in your terminal under the correct version within the context of the Ogmios folder.
 
 ```bash
-generatejsonschematypes --rootNamespace Generated -disableNamingHeuristic --outputPath Generated Source/ogmios.json
+generatejsonschematypes --rootNamespace Generated -disableNamingHeuristic --outputPath Generated v6.11/Source/ogmios.json
 ```
