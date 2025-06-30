@@ -46,7 +46,7 @@ public readonly partial struct Metadatum
                         result = result.UsingStack();
                     }
 
-                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/Metadatum/anyOf/0/oneOf/3");
+                    result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/Metadatum/anyOf/0/oneOf/3");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;

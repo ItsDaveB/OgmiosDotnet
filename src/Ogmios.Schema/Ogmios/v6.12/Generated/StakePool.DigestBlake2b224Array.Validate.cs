@@ -46,7 +46,7 @@ public readonly partial struct StakePool
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/StakePool/properties/owners");
+                result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/StakePool/properties/owners");
             }
 
             JsonValueKind valueKind = this.ValueKind;

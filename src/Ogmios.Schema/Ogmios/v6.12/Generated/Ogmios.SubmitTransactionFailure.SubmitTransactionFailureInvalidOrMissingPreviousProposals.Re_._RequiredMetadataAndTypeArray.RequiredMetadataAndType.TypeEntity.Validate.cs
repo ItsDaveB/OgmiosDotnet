@@ -71,7 +71,7 @@ public readonly partial struct Ogmios
                                         result = result.UsingStack();
                                     }
 
-                                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/ogmios.json#/definitions/SubmitTransactionFailure/oneOf/60/properties/data/properties/invalidOrMissingPreviousProposals/items/properties/type");
+                                    result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/ogmios.json#/definitions/SubmitTransactionFailure/oneOf/60/properties/data/properties/invalidOrMissingPreviousProposals/items/properties/type");
                                 }
 
                                 JsonValueKind valueKind = this.ValueKind;

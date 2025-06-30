@@ -74,7 +74,7 @@ public readonly partial struct BootstrapOperationalCertificate
         /// <summary>
         /// Gets the schema location from which this type was generated.
         /// </summary>
-        public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/BootstrapOperationalCertificate/properties/issuer";
+        public static string SchemaLocation { get; } = "OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/BootstrapOperationalCertificate/properties/issuer";
 
         /// <summary>
         /// Gets a Null instance.

@@ -46,7 +46,7 @@ public readonly partial struct GenesisShelley
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/Genesis<Shelley>/properties/era");
+                result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/Genesis<Shelley>/properties/era");
             }
 
             JsonValueKind valueKind = this.ValueKind;

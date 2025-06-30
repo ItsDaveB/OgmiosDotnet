@@ -48,7 +48,7 @@ public readonly partial struct Certificate
                         result = result.UsingStack();
                     }
 
-                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/Certificate/oneOf/9/properties/metadata");
+                    result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/Certificate/oneOf/9/properties/metadata");
                 }
 
                 result = CorvusValidation.CompositionOneOfValidationHandler(this, result, level);

@@ -79,7 +79,7 @@ public readonly partial struct Ogmios
             /// <summary>
             /// Gets the schema location from which this type was generated.
             /// </summary>
-            public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/ogmios.json#/definitions/SubmitTransactionFailure/oneOf/6";
+            public static string SchemaLocation { get; } = "OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/ogmios.json#/definitions/SubmitTransactionFailure/oneOf/6";
 
             /// <summary>
             /// Gets a Null instance.

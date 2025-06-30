@@ -56,7 +56,7 @@ public readonly partial struct ConstitutionalCommitteeMember
                             result = result.UsingStack();
                         }
 
-                        result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/ConstitutionalCommitteeMember/properties/next/oneOf/3/properties/change");
+                        result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/ConstitutionalCommitteeMember/properties/next/oneOf/3/properties/change");
                     }
 
                     JsonValueKind valueKind = this.ValueKind;

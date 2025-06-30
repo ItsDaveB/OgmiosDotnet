@@ -51,7 +51,7 @@ public readonly partial struct Ogmios
                         result = result.UsingStack();
                     }
 
-                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/ogmios.json#/definitions/StakePoolSummary/properties/approximatePerformance");
+                    result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/ogmios.json#/definitions/StakePoolSummary/properties/approximatePerformance");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;
@@ -136,7 +136,7 @@ public readonly partial struct Ogmios
 
                     if ((value.HasJsonElementBacking
                         ? BinaryJsonNumber.Compare(value.AsJsonElement, Minimum)
-                        : BinaryJsonNumber.Compare(value.AsBinaryJsonNumber, Minimum))>= 0)
+                        : BinaryJsonNumber.Compare(value.AsBinaryJsonNumber, Minimum)) >= 0)
                     {
                         if (level == ValidationLevel.Verbose)
                         {

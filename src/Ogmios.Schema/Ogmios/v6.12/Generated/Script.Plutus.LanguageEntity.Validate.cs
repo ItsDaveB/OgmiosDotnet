@@ -46,7 +46,7 @@ public readonly partial struct Script
                         result = result.UsingStack();
                     }
 
-                    result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/Script/oneOf/1/properties/language");
+                    result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/Script/oneOf/1/properties/language");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;

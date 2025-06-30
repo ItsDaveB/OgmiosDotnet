@@ -41,7 +41,7 @@ public readonly partial struct GovernanceProposalState
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/GovernanceProposalState/properties/since");
+                result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/GovernanceProposalState/properties/since");
             }
 
             JsonValueKind valueKind = this.ValueKind;

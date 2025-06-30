@@ -40,7 +40,7 @@ public readonly partial struct GenesisStakePools
                 result = result.UsingStack();
             }
 
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/GenesisStakePools");
+            result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/GenesisStakePools");
         }
 
         JsonValueKind valueKind = this.ValueKind;

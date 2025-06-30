@@ -35,7 +35,7 @@ public readonly partial struct UInt16
                 result = result.UsingStack();
             }
 
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/UInt16");
+            result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/UInt16");
         }
 
         JsonValueKind valueKind = this.ValueKind;
@@ -128,7 +128,7 @@ public readonly partial struct UInt16
 
             if ((value.HasJsonElementBacking
                 ? BinaryJsonNumber.Compare(value.AsJsonElement, Maximum)
-                : BinaryJsonNumber.Compare(value.AsBinaryJsonNumber, Maximum))<= 0)
+                : BinaryJsonNumber.Compare(value.AsBinaryJsonNumber, Maximum)) <= 0)
             {
                 if (level == ValidationLevel.Verbose)
                 {
@@ -153,7 +153,7 @@ public readonly partial struct UInt16
 
             if ((value.HasJsonElementBacking
                 ? BinaryJsonNumber.Compare(value.AsJsonElement, Minimum)
-                : BinaryJsonNumber.Compare(value.AsBinaryJsonNumber, Minimum))>= 0)
+                : BinaryJsonNumber.Compare(value.AsBinaryJsonNumber, Minimum)) >= 0)
             {
                 if (level == ValidationLevel.Verbose)
                 {

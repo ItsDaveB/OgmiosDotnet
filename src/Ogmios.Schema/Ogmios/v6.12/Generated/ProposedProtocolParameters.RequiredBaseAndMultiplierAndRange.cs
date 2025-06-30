@@ -69,7 +69,7 @@ public readonly partial struct ProposedProtocolParameters
         /// <summary>
         /// Gets the schema location from which this type was generated.
         /// </summary>
-        public static string SchemaLocation { get; } = "https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/ProposedProtocolParameters/properties/minFeeReferenceScripts";
+        public static string SchemaLocation { get; } = "OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/ProposedProtocolParameters/properties/minFeeReferenceScripts";
 
         /// <summary>
         /// Gets a Null instance.

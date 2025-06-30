@@ -35,7 +35,7 @@ public readonly partial struct DelegateRepresentative
                 result = result.UsingStack();
             }
 
-            result = result.PushSchemaLocation("https://endjin.com/Users/davebeaumont/source/cardano-public/OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/DelegateRepresentative");
+            result = result.PushSchemaLocation("OgmiosDotnet/src/Ogmios.Schema/Ogmios/v6.12/Source/cardano.json#/definitions/DelegateRepresentative");
         }
 
         result = CorvusValidation.CompositionOneOfValidationHandler(this, result, level);
