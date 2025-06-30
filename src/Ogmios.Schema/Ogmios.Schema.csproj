@@ -7,7 +7,7 @@
     <RootNamespace>Ogmios.Schema</RootNamespace>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>6.11.0.1</Version>
+    <Version>6.12.0.0</Version>
     <Authors>Dave B</Authors>
     <PackageId>OgmiosDotnetClient.Schema</PackageId>
     <Description>Versioned auto-generated idiomatic types as a typed representation of Ogmios schema.</Description>
