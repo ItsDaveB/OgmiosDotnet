@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <!-- <ProjectReference Include="..\Ogmios.Schema\Ogmios.Schema.csproj" /> -->
-    <PackageReference Include="OgmiosDotnetClient.Schema" Version="6.11.0.1" />
+    <PackageReference Include="OgmiosDotnetClient.Schema" Version="6.12.0.0" />
   </ItemGroup>
 
 </Project>
