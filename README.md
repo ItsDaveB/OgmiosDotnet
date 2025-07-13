@@ -1,9 +1,5 @@
-
-<div align="center">
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/LICENSE)
-</div>
-
 # OgmiosDotnetClient: A Cardano Node Integration Library
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/LICENSE)
 
 ## Overview
 
