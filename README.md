@@ -1,5 +1,15 @@
 # OgmiosDotnetClient: A Cardano Node Integration Library
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/ItsDaveB/OgmiosDotnet)](https://github.com/ItsDaveB/OgmiosDotnet/releases/latest)
+
+[![NuGet Ogmios Schema Version](https://img.shields.io/nuget/v/OgmiosDotnetClient.Schema?label=NuGet%20Ogmios%20Schema)](https://www.nuget.org/packages/OgmiosDotnetClient.Schema)
+[![NuGet Ogmios Services Version](https://img.shields.io/nuget/v/OgmiosDotnetClient.Services?label=NuGet%20Ogmios%20Services)](https://www.nuget.org/packages/OgmiosDotnetClient.Services)
+[![NuGet Ogmios Schema Downloads](https://img.shields.io/nuget/dt/OgmiosDotnetClient.Schema?label=NuGet%20Ogmios%20Schema%20Downloads)](https://www.nuget.org/packages/OgmiosDotnetClient.Schema)
+[![NuGet Ogmios Services Downloads](https://img.shields.io/nuget/dt/OgmiosDotnetClient.Services?label=NuGet%20Ogmios%20Services%20Downloads)](https://www.nuget.org/packages/OgmiosDotnetClient.Services)
+
+
+
+
 
 ## Overview
 
