@@ -75,7 +75,7 @@ public readonly partial struct Epoch
         /// <summary>
         /// A constant for the <c>maximum</c> keyword.
         /// </summary>
-        public static readonly BinaryJsonNumber Maximum = new(18446744073709552000);
+        public static readonly BinaryJsonNumber Maximum = new(1844674407370955200);
 
         /// <summary>
         /// A constant for the <c>minimum</c> keyword.

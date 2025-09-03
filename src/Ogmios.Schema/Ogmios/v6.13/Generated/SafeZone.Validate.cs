@@ -75,7 +75,7 @@ public readonly partial struct SafeZone
         /// <summary>
         /// A constant for the <c>maximum</c> keyword.
         /// </summary>
-        public static readonly BinaryJsonNumber Maximum = new(18446744073709552999);
+        public static readonly BinaryJsonNumber Maximum = new(1844674407370955299);
 
         /// <summary>
         /// A constant for the <c>minimum</c> keyword.
