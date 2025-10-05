@@ -90,8 +90,8 @@ namespace Ogmios.Tests.ChainSynchronization
         {
             // Arrange
             var interactionContext = CreateMockInteractionContext();
-            var point = Point.Create(id: interactionContext.StartingPoint.StartingPointIdOrOrigin, slot: Slot.FromAny(interactionContext.StartingPoint.StartingPointSlot));
-            var tip = Tip.Create(height: BlockHeight.FromAny(string.Empty), id: interactionContext.StartingPoint.StartingPointIdOrOrigin, Slot.FromAny(interactionContext.StartingPoint.StartingPointSlot));
+            var point = Point.Create(id: interactionContext.StartingPoint.StartingPointIdOrOrigin, slot: Slot.FromAny(interactionContext.StartingPoint.StartingPointSlot.GetValueOrDefault()));
+            var tip = Tip.Create(height: BlockHeight.FromAny(string.Empty), id: interactionContext.StartingPoint.StartingPointIdOrOrigin, Slot.FromAny(interactionContext.StartingPoint.StartingPointSlot.GetValueOrDefault()));
 
             var intersectionFound = Generated.Ogmios.FindIntersectionResponseEntity.IntersectionFound.Create(
                 jsonrpc: "2.0",
