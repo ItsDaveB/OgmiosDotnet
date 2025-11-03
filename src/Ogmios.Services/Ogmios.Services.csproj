@@ -7,10 +7,10 @@
     <RootNamespace>Ogmios.Services</RootNamespace>
     
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>6.13.1</Version>
+    <Version>6.13.1.1</Version>
     <Authors>Dave B</Authors>
     <PackageId>OgmiosDotnetClient.Services</PackageId>
-    <Description>A set of services and extensions for integrating Ogmios functionality, including chain synchronization, memory pool monitoring, and server health monitoring.</Description>
+    <Description>A set of services and extensions for integrating Ogmios functionality, including chain synchronization, memory pool monitoring, transaction submission, transaction evaluation, and server health monitoring.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression> 
     <RepositoryUrl>https://github.com/ItsDaveB/OgmiosDotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
