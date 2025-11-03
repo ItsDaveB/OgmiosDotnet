@@ -3,7 +3,7 @@ using Corvus.Json;
 using Ogmios.Domain;
 using Ogmios.Services.ChainSynchronization;
 
-namespace Ogmios.Services.TransactionSubmission
+namespace Ogmios.Services.TransactionEvaluation
 {
     public class TransactionEvaluationService(IWebSocketService webSocketService) : ITransactionEvaluationService
     {

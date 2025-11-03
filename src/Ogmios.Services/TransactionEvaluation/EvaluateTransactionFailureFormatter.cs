@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Ogmios.Services.TransactionSubmission
+namespace Ogmios.Services.TransactionEvaluation
 {
     internal static class EvaluateTransactionFailureFormatter
     {

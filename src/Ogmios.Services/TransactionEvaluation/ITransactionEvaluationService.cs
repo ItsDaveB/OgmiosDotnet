@@ -1,6 +1,6 @@
 using Ogmios.Domain;
 
-namespace Ogmios.Services.TransactionSubmission
+namespace Ogmios.Services.TransactionEvaluation
 {
     public interface ITransactionEvaluationService
     {
