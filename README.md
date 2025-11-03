@@ -19,9 +19,9 @@ This project is divided into the following modules:
 - [Chain Synchronization](src/Ogmios.Services/ChainSynchronization/docs/README.md): Covers the chain synchronization process, including real-time updates and blockchain data handling.
 - [Memory Pool Monitoring](src/Ogmios.Services/MemoryPoolMonitoring/docs/README.md): Provides an overview of mempool monitoring for tracking transactions and querying mempool details.
 - [Ogmios Schema](src/Ogmios.Schema/docs/README.md): Contains the auto-generated strongly-typed C# classes based on the Ogmios JSON schema for the version in question.
-- [Ogmios Worker Example](src/Ogmios.Example.Worker/docs/README.md): Demonstrates the capabilities of the Ogmios Client package through a fully functional worker application. This example showcases chain synchronization, mempool monitoring, and custom handler implementations, along with in-memory database operations for data persistence and flexibility.
 - [Transaction Evaluation](src/Ogmios.Services/TransactionEvaluation/docs/README.md): Evaluate signed transactions to estimate execution units and detect obvious rejections before submission.
 - [Transaction Submission](src/Ogmios.Services/TransactionSubmission/docs/README.md): Submit signed transactions to the node for mempool inclusion and eventual confirmation.
+- [Ogmios Worker Example](src/Ogmios.Example.Worker/docs/README.md): Demonstrates the capabilities of the Ogmios Client package through a fully functional worker application. This example showcases chain synchronization, mempool monitoring, and custom handler implementations, along with in-memory database operations for data persistence and flexibility.
 
 ## Requirements
 
