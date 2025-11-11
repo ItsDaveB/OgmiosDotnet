@@ -34,6 +34,10 @@ public class BlockService(IWebSocketService webSocketService) : IBlockService
                 if (block.HasProperty("height") && block.TryGetProperty("height", out var height) && block.HasProperty("type") && block.TryGetProperty("type", out var type))
                 {
                     var blocktype = (string)type.AsString ?? "Unknown type";
+                    if (height.AsNumber % 1000 == 0)
+                    {
+                        Console.WriteLine($"\u001b[32m {height}\u001b[0m");
+                    }
                     await messageHandlers.RollForwardHandler(block, blocktype, result.Instance.Result.AsRollForward.Tip);
                 }
                 break;
