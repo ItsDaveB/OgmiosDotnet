@@ -16,6 +16,8 @@ This application is open-source and designed for easy cloning, use, and extensio
 
 - **Chain Synchronization**: Reads and processes blocks from the blockchain.
 - **Mempool Monitoring**: Tracks mempool transactions and metadata.
+- **Transaction Evaluation**: Demonstrates evaluating transactions to estimate execution units before submission.
+- **Transaction Submission**: Demonstrates submitting signed transactions to the Cardano blockchain.
 - **Data Persistence**: Saves transactions to an in-memory PostgreSQL database using Entity Framework.
 - **Extendable Architecture**: Easily customize or replace components.
 - **Unit Testing**: Includes tests for mocking data and validating database operations.
@@ -73,7 +75,9 @@ This application is open-source and designed for easy cloning, use, and extensio
 
 1. **Chain Synchronization**: Processes blocks from blockchain slots and saves transaction data.
 2. **Mempool Monitoring**: Tracks live mempool transactions and metadata.
-3. **Database Integration**: Persists transaction data in a PostgreSQL database.
+3. **Transaction Evaluation**: Evaluates transactions with CBOR-encoded data to estimate execution budgets and validator information.
+4. **Transaction Submission**: Submits CBOR-encoded signed transactions to the Cardano blockchain and returns the transactionId.
+5. **Database Integration**: Persists transaction data in a PostgreSQL database.
 
 ---
 
