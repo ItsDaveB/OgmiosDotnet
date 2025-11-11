@@ -4,10 +4,19 @@ using Ogmios.Example.Database.Services;
 using Ogmios.Services.ChainSynchronization;
 using Ogmios.Services.InteractionContext;
 using Ogmios.Services.MemoryPoolMonitoring;
+using Ogmios.Services.TransactionEvaluation;
+using Ogmios.Services.TransactionSubmission;
 
 namespace Ogmios.Example.Worker
 {
-    public class OgmiosWorker(ILogger<OgmiosWorker> logger, IInteractionContextFactory contextFactory, IChainSynchronizationClientService chainSynchronizationClientService, IMemoryPoolMonitoringService memoryPoolMonitoringService, IConfiguration configuration, ITransactionService transactionService) : BackgroundService
+    public class OgmiosWorker(ILogger<OgmiosWorker> logger,
+    IInteractionContextFactory contextFactory,
+    IChainSynchronizationClientService chainSynchronizationClientService,
+    IMemoryPoolMonitoringService memoryPoolMonitoringService,
+    IConfiguration configuration,
+    ITransactionService transactionService,
+    ITransactionSubmissionService transactionSubmissionService,
+    ITransactionEvaluationService transactionEvaluationService) : BackgroundService
     {
         private readonly ILogger<OgmiosWorker> _logger = logger;
         private readonly IInteractionContextFactory _contextFactory = contextFactory;
@@ -15,6 +24,8 @@ namespace Ogmios.Example.Worker
         private readonly IMemoryPoolMonitoringService _memoryPoolMonitoringService = memoryPoolMonitoringService;
         private readonly IConfiguration _configuration = configuration;
         private readonly ITransactionService _transactionService = transactionService;
+        private readonly ITransactionSubmissionService _transactionSubmissionService = transactionSubmissionService;
+        private readonly ITransactionEvaluationService _transactionEvaluationService = transactionEvaluationService;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -34,14 +45,8 @@ namespace Ogmios.Example.Worker
                     contexts.Add(context);
                 }
 
-                // Chain Synchronization. 
-                var chainSynchronizationTask = PerformChainSynchronizationOperations(contexts, ogmiosConfiguration, stoppingToken);
-                await chainSynchronizationTask;
-
-                // Memory Pool Monitoring.
-                // var memoryPoolMonitoringTask = PerformMemPoolMonitoringOperations(contexts, stoppingToken);
-                // await memoryPoolMonitoringTask;
-
+                await PerformTransactionEvaluationOperations(contexts, stoppingToken);
+                await PerformTransactionSubmissionOperations(contexts, stoppingToken);
             }
             catch (OperationCanceledException ex)
             {
@@ -60,6 +65,36 @@ namespace Ogmios.Example.Worker
         private async Task PerformChainSynchronizationOperations(List<InteractionContext> contexts, OgmiosConfiguration ogmiosConfiguration, CancellationToken stoppingToken)
         {
             var points = await _chainSynchronizationClientService.ResumeAsync(contexts, maxBlocksPerSecond: ogmiosConfiguration.MaxBlocksPerSecond, inFlight: 100, stoppingToken);
+        }
+
+        private async Task PerformTransactionEvaluationOperations(List<InteractionContext> contexts, CancellationToken stoppingToken)
+        {
+            var context = contexts.FirstOrDefault();
+            if (context is null) return;
+
+            var cborRawForEvaluation = "CBORHex";
+            var cborToEvaluate = Generated.Ogmios.EvaluateTransaction.RequiredTransaction.RequiredCbor.Create(
+                Generated.Ogmios.EvaluateTransaction.RequiredTransaction.RequiredCbor.CborSerializedSignedTransactionBase16.FromAny(cborRawForEvaluation));
+
+            var evaluationResponse = await _transactionEvaluationService.EvaluateTransactionAsync(context, cborToEvaluate.Cbor, cancellationToken: stoppingToken);
+            var successResponse = evaluationResponse.AsEvaluateTransactionSuccess.Result;
+
+            var budget = successResponse.FirstOrDefault().Budget;
+            var validator = successResponse.FirstOrDefault().Validator;
+            _logger.LogInformation("Budget: {budget}, Validator: {validator}", budget, validator);
+        }
+
+        private async Task PerformTransactionSubmissionOperations(List<InteractionContext> contexts, CancellationToken stoppingToken)
+        {
+            var context = contexts.FirstOrDefault();
+            if (context is null) return;
+
+            var cborRawForSubmission = "CBORHex";
+            var transactionToSubmit = Generated.Ogmios.SubmitTransaction.RequiredTransaction.RequiredCbor.Create(
+                Generated.Ogmios.SubmitTransaction.RequiredTransaction.RequiredCbor.CborSerializedSignedTransactionBase16.FromAny(cborRawForSubmission));
+
+            var transactionSubmissionResult = await _transactionSubmissionService.SubmitTransactionAsync(context, transactionToSubmit.Cbor, cancellationToken: stoppingToken);
+            _logger.LogInformation("Transaction Id: {transactionId}", (string)transactionSubmissionResult.AsSubmitTransactionSuccess.Id.AsString);
         }
 
         private async Task PerformMemPoolMonitoringOperations(List<InteractionContext> contexts, CancellationToken stoppingToken)
