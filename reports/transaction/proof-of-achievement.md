@@ -42,7 +42,7 @@ OgmiosDotnet now offers production-ready transaction submission and evaluation c
 **Evidence:**
 
 - Service: [`TransactionSubmissionService.cs`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Services/TransactionSubmission/TransactionSubmissionService.cs)
-- Exceptions: [`SubmitTransactionFailedException.cs`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Services/TransactionSubmission/SubmitTransactionFailedException.cs)
+- Exceptions: [`SubmitTransactionExceptions.cs`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Services/TransactionSubmission/SubmitTransactionExceptions.cs)
 - Example: [`OgmiosWorker.cs#L85-L96`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Example.Worker/OgmiosWorker.cs#L85-L96)
 - Documentation: [`TransactionSubmission/docs/README.md`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Services/TransactionSubmission/docs/README.md)
 
@@ -55,7 +55,7 @@ OgmiosDotnet now offers production-ready transaction submission and evaluation c
 **Evidence:**
 
 - Service: [`TransactionEvaluationService.cs`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Services/TransactionEvaluation/TransactionEvaluationService.cs)
-- Exceptions: [`EvaluateTransactionFailedException.cs`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Services/TransactionEvaluation/EvaluateTransactionFailedException.cs)
+- Exceptions: [`TransactionEvaluationExceptions.cs`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Services/TransactionEvaluation/TransactionEvaluationExceptions.cs)
 - Example: [`OgmiosWorker.cs#L68-L83`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Example.Worker/OgmiosWorker.cs#L68-L83)
 - Documentation: [`TransactionEvaluation/docs/README.md`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Services/TransactionEvaluation/docs/README.md)
 
