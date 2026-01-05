@@ -10,7 +10,7 @@ namespace Ogmios.Services.LedgerStateQueries
         private readonly IWebSocketService _webSocketService = webSocketService ?? throw new ArgumentNullException(nameof(webSocketService));
 
         public async Task<Generated.Ogmios.QueryLedgerStateGovernanceProposalsResponseEntity> GetGovernanceProposalsAsync(
-            Domain.InteractionContext context,
+            OgmiosInteractionContext context,
             Generated.Ogmios.QueryLedgerStateGovernanceProposals? request = null,
             MirrorOptions? mirrorOptions = null,
             CancellationToken cancellationToken = default)

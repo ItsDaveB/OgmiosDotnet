@@ -1,9 +1,12 @@
-using OgmiosSchema = Generated.Ogmios;
 
 namespace Ogmios.Services.LedgerStateQueries.Contracts
 {
     public interface ILedgerStateRewardsProvenanceService
     {
-        Task<OgmiosSchema.QueryLedgerStateRewardsProvenanceResponseEntity> GetRewardsProvenanceAsync(OgmiosSchema.QueryLedgerStateRewardsProvenance? request = null, CancellationToken cancellationToken = default);
+        Task<OgmiosSchema.QueryLedgerStateRewardsProvenanceResponseEntity> GetRewardsProvenanceAsync(
+            OgmiosInteractionContext context,
+            OgmiosSchema.QueryLedgerStateRewardsProvenance? request = null,
+            MirrorOptions? mirrorOptions = null,
+            CancellationToken cancellationToken = default);
     }
 }

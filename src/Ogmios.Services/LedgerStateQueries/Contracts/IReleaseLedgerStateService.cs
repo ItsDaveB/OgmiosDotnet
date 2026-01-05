@@ -1,11 +1,11 @@
 
 namespace Ogmios.Services.LedgerStateQueries.Contracts
 {
-    public interface ILedgerStateStakePoolsService
+    public interface IReleaseLedgerStateService
     {
-        Task<OgmiosSchema.QueryLedgerStateStakePoolsResponseEntity> GetStakePoolsAsync(
+        Task<OgmiosSchema.ReleaseLedgerStateResponse> ReleaseAsync(
             OgmiosInteractionContext context,
-            OgmiosSchema.QueryLedgerStateStakePools? request = null,
+            OgmiosSchema.ReleaseLedgerState? request = null,
             MirrorOptions? mirrorOptions = null,
             CancellationToken cancellationToken = default);
     }

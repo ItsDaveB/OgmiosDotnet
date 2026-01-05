@@ -1,9 +1,12 @@
-using OgmiosSchema = Generated.Ogmios;
 
 namespace Ogmios.Services.LedgerStateQueries.Contracts
 {
     public interface ILedgerStateGovernanceProposalsService
     {
-        Task<OgmiosSchema.QueryLedgerStateGovernanceProposalsResponseEntity> GetGovernanceProposalsAsync(OgmiosSchema.QueryLedgerStateGovernanceProposals? request = null, CancellationToken cancellationToken = default);
+        Task<OgmiosSchema.QueryLedgerStateGovernanceProposalsResponseEntity> GetGovernanceProposalsAsync(
+            OgmiosInteractionContext context,
+            OgmiosSchema.QueryLedgerStateGovernanceProposals? request = null,
+            MirrorOptions? mirrorOptions = null,
+            CancellationToken cancellationToken = default);
     }
 }

@@ -1,4 +1,3 @@
-using OgmiosSchema = Generated.Ogmios;
 
 namespace Ogmios.Services.LedgerStateQueries.Contracts
 {
@@ -13,9 +12,10 @@ namespace Ogmios.Services.LedgerStateQueries.Contracts
         /// Acquire a ledger-state snapshot from Ogmios (AcquireLedgerState) or from cache depending on
         /// implementation details.
         /// </summary>
-        /// <param name="request">Optional AcquireLedgerState request entity (will be forwarded to Ogmios where applicable).</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>The raw AcquireLedgerState response entity as produced by the generated Ogmios schema types.</returns>
-        Task<OgmiosSchema.AcquireLedgerStateResponseEntity> AcquireAsync(OgmiosSchema.AcquireLedgerState? request = null);
+        Task<OgmiosSchema.AcquireLedgerStateResponseEntity> AcquireAsync(
+        OgmiosInteractionContext context,
+        OgmiosSchema.AcquireLedgerState? request = null,
+        MirrorOptions? mirrorOptions = null,
+        CancellationToken cancellationToken = default);
     }
 }
