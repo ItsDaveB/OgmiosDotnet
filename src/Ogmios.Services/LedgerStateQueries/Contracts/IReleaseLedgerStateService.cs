@@ -6,7 +6,7 @@ namespace Ogmios.Services.LedgerStateQueries.Contracts
     public interface IReleaseLedgerStateService
     {
         Task<OgmiosSchema.ReleaseLedgerStateResponse> ReleaseAsync(
-            Domain.InteractionContext context,
+            global::Ogmios.Domain.InteractionContext context,
             OgmiosSchema.ReleaseLedgerState? request = null,
             MirrorOptions? mirrorOptions = null,
             CancellationToken cancellationToken = default);
