@@ -1,5 +1,3 @@
-using Ogmios.Domain;
-using OgmiosSchema = Generated.Ogmios;
 
 namespace Ogmios.Services.LedgerStateQueries.Contracts
 {
@@ -15,7 +13,7 @@ namespace Ogmios.Services.LedgerStateQueries.Contracts
         /// implementation details.
         /// </summary>
         Task<OgmiosSchema.AcquireLedgerStateResponseEntity> AcquireAsync(
-     global::Ogmios.Domain.InteractionContext context,
+     OgmiosInteractionContext context,
      OgmiosSchema.AcquireLedgerState? request = null,
      MirrorOptions? mirrorOptions = null,
      CancellationToken cancellationToken = default);

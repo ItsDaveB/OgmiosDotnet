@@ -10,7 +10,7 @@ namespace Ogmios.Services.LedgerStateQueries
         private readonly IWebSocketService _webSocketService = webSocketService ?? throw new ArgumentNullException(nameof(webSocketService));
 
         public async Task<Generated.Ogmios.QueryLedgerStateProjectedRewardsResponseEntity> GetProjectedRewardsAsync(
-            Domain.InteractionContext context,
+            OgmiosInteractionContext context,
             Generated.Ogmios.QueryLedgerStateProjectedRewards? request = null,
             MirrorOptions? mirrorOptions = null,
             CancellationToken cancellationToken = default)

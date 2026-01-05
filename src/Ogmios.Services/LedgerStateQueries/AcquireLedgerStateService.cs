@@ -11,7 +11,7 @@ namespace Ogmios.Services.LedgerStateQueries
         private readonly IWebSocketService _webSocketService = webSocketService ?? throw new ArgumentNullException(nameof(webSocketService));
 
         public async Task<Generated.Ogmios.AcquireLedgerStateResponseEntity> AcquireAsync(
-            Domain.InteractionContext context,
+            OgmiosInteractionContext context,
             Generated.Ogmios.AcquireLedgerState? request = null,
             MirrorOptions? mirrorOptions = null,
             CancellationToken cancellationToken = default)
@@ -53,7 +53,7 @@ namespace Ogmios.Services.LedgerStateQueries
             throw new AcquireLedgerStateFailedException("Failed to acquire ledger state: " + responseMessage, responseMessage);
         }
 
-        private async Task<Generated.Ogmios.PointOrOrigin.Point> QueryNetworkTipAsync(Domain.InteractionContext context, CancellationToken cancellationToken)
+        private async Task<Generated.Ogmios.PointOrOrigin.Point> QueryNetworkTipAsync(OgmiosInteractionContext context, CancellationToken cancellationToken)
         {
             var queryRequest = Generated.Ogmios.QueryNetworkTip.Create(
                 jsonrpc: Generated.Ogmios.QueryNetworkTip.JsonrpcEntity.EnumValues.Value20,

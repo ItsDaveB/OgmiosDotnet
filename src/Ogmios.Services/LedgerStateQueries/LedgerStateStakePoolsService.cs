@@ -10,7 +10,7 @@ namespace Ogmios.Services.LedgerStateQueries
         private readonly IWebSocketService _webSocketService = webSocketService ?? throw new ArgumentNullException(nameof(webSocketService));
 
         public async Task<Generated.Ogmios.QueryLedgerStateStakePoolsResponseEntity> GetStakePoolsAsync(
-            Domain.InteractionContext context,
+            OgmiosInteractionContext context,
             Generated.Ogmios.QueryLedgerStateStakePools? request = null,
             MirrorOptions? mirrorOptions = null,
             CancellationToken cancellationToken = default)
