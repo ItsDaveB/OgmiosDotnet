@@ -13,9 +13,9 @@ namespace Ogmios.Services.LedgerStateQueries.Contracts
         /// implementation details.
         /// </summary>
         Task<OgmiosSchema.AcquireLedgerStateResponseEntity> AcquireAsync(
-     OgmiosInteractionContext context,
-     OgmiosSchema.AcquireLedgerState? request = null,
-     MirrorOptions? mirrorOptions = null,
-     CancellationToken cancellationToken = default);
+        OgmiosInteractionContext context,
+        OgmiosSchema.AcquireLedgerState? request = null,
+        MirrorOptions? mirrorOptions = null,
+        CancellationToken cancellationToken = default);
     }
 }
