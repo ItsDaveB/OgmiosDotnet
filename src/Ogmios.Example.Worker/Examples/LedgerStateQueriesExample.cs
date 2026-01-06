@@ -39,7 +39,7 @@ public class LedgerStateQueriesExample(
         var serverAddress = BuildServerUri(ogmiosConfiguration);
 
         // Get server health and tip
-        Console.WriteLine($"\u001b[36m[ServerHealth] Getting server health from {serverAddress}...\u001b[0m");
+        Console.WriteLine($"\u001b[36m[ServerHealth] Getting server health from Ogmios endpoint...\u001b[0m");
         var serverHealth = await serverHealthService.GetServerHealthAsync(serverAddress);
         var tip = serverHealth.LastKnownTip;
         Console.WriteLine($"\u001b[32m[ServerHealth] Server tip: Slot {tip.Slot}, Id {tip.Id}\u001b[0m");
@@ -99,6 +99,14 @@ public class LedgerStateQueriesExample(
         Console.WriteLine($"\u001b[32m[ReleaseLedgerState] Ledger state released\u001b[0m");
 
         Console.WriteLine("\u001b[33m--- Ledger State Query Demonstration Complete ---\u001b[0m");
+        Console.WriteLine();
+        Console.WriteLine("\u001b[35m╔══════════════════════════════════════════════════════════════════════════════╗\u001b[0m");
+        Console.WriteLine("\u001b[35m║  ✅ Demo Complete - All queries executed successfully against MAINNET        ║\u001b[0m");
+        Console.WriteLine("\u001b[35m║                                                                              ║\u001b[0m");
+        Console.WriteLine("\u001b[35m║  Thank you to Demeter.run for providing the hosted Ogmios infrastructure!   ║\u001b[0m");
+        Console.WriteLine("\u001b[35m║  Learn more at: https://demeter.run                                         ║\u001b[0m");
+        Console.WriteLine("\u001b[35m╚══════════════════════════════════════════════════════════════════════════════╝\u001b[0m");
+        Console.WriteLine();
     }
 
     private async Task QueryStakePoolAsync(InteractionContext context, CancellationToken cancellationToken)

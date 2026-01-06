@@ -280,7 +280,7 @@ Both packages include v6.13 schema support and all 22 ledger state query service
 
 **Evidence:**
 
-- **YouTube Demo**: [TODO: INSERT YOUTUBE LINK HERE]
+- **YouTube Demo**: https://youtu.be/eMeW-evtEKQ
 
 The video demonstrates:
 
@@ -318,4 +318,4 @@ The functionality is production-ready and available via published NuGet packages
 | NuGet Schema Package   | https://www.nuget.org/packages/OgmiosDotnetClient.Schema                                                          |
 | NuGet Services Package | https://www.nuget.org/packages/OgmiosDotnetClient.Services                                                        |
 | Milestone Report       | This document                                                                                                     |
-| YouTube Demo           | [TODO: INSERT YOUTUBE LINK HERE]                                                                                  |
+| YouTube Demo           | https://youtu.be/eMeW-evtEKQ                                                                                      |
