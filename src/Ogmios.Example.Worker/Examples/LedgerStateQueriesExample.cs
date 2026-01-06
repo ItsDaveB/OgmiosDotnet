@@ -24,6 +24,15 @@ public class LedgerStateQueriesExample(
 
     public async Task ExecuteAsync(InteractionContext context, OgmiosConfiguration ogmiosConfiguration, CancellationToken cancellationToken)
     {
+        Console.WriteLine();
+        Console.WriteLine("\u001b[35m╔══════════════════════════════════════════════════════════════════════════════╗\u001b[0m");
+        Console.WriteLine("\u001b[35m║                    OgmiosDotnet - Ledger State Query Demo                    ║\u001b[0m");
+        Console.WriteLine("\u001b[35m║                                                                              ║\u001b[0m");
+        Console.WriteLine("\u001b[35m║  🌐 Network: Cardano MAINNET                                                 ║\u001b[0m");
+        Console.WriteLine("\u001b[35m║  🚀 Powered by: Demeter.run Hosted Ogmios Service                            ║\u001b[0m");
+        Console.WriteLine("\u001b[35m║  📦 Library: OgmiosDotnet v6.13.1.3                                          ║\u001b[0m");
+        Console.WriteLine("\u001b[35m╚══════════════════════════════════════════════════════════════════════════════╝\u001b[0m");
+        Console.WriteLine();
         Console.WriteLine("\u001b[33m--- Ledger State Query Demonstration ---\u001b[0m");
 
         // Build server URL for health check
