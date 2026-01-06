@@ -2,7 +2,56 @@
 
 ## Proof of Achievement
 
-OgmiosDotnet now provides complete ledger state query capabilities, exposing all 21 ledger state queries from the Ogmios v6.13 API as typed .NET services.
+OgmiosDotnet now provides complete ledger state query capabilities, exposing all 21 ledger state queries from the Ogmios v6.13 API as typed .NET services, plus 2 lifecycle services for acquiring and releasing ledger state snapshots.
+
+---
+
+## Acceptance Criteria
+
+| Criteria                                                                                         |
+| ------------------------------------------------------------------------------------------------ |
+| Every ledger state query listed has a typed service with request and response models implemented |
+| All queries can be executed against mainnet and return typed results                             |
+| Worker example demonstrates at least 5 queries in a running demo                                 |
+| Unit tests cover serialization and deserialization across all services and pass                  |
+| New OgmiosDotnet version is available with referenced functionality                              |
+
+---
+
+## Ledger State Query Implementations
+
+All 21 ledger state queries from Ogmios v6.13 API are implemented:
+
+| Ogmios Query                           | Service Implementation                         |
+| -------------------------------------- | ---------------------------------------------- |
+| ledgerState/constitution               | `LedgerStateConstitutionService`               |
+| ledgerState/constitutionalCommittee    | `LedgerStateConstitutionalCommitteeService`    |
+| ledgerState/delegateRepresentative     | `LedgerStateDelegateRepresentativesService`    |
+| ledgerState/dump                       | `LedgerStateDumpService`                       |
+| ledgerState/epoch                      | `LedgerStateEpochService`                      |
+| ledgerState/eraStart                   | `LedgerStateEraStartService`                   |
+| ledgerState/eraSummaries               | `LedgerStateEraSummariesService`               |
+| ledgerState/governanceProposals        | `LedgerStateGovernanceProposalsService`        |
+| ledgerState/liveStakeDistribution      | `LedgerStateLiveStakeDistributionService`      |
+| ledgerState/nonces                     | `LedgerStateNoncesService`                     |
+| ledgerState/operationalCertificates    | `LedgerStateOperationalCertificatesService`    |
+| ledgerState/projectedRewards           | `LedgerStateProjectedRewardsService`           |
+| ledgerState/protocolParameters         | `LedgerStateProtocolParametersService`         |
+| ledgerState/proposedProtocolParameters | `LedgerStateProposedProtocolParametersService` |
+| ledgerState/rewardAccountSummaries     | `LedgerStateRewardAccountSummariesService`     |
+| ledgerState/rewardsProvenance          | `LedgerStateRewardsProvenanceService`          |
+| ledgerState/stakePools                 | `LedgerStateStakePoolsService`                 |
+| ledgerState/stakePoolsPerformances     | `LedgerStateStakePoolsPerformancesService`     |
+| ledgerState/tip                        | `LedgerStateTipService`                        |
+| ledgerState/treasuryAndReserves        | `LedgerStateTreasuryAndReservesService`        |
+| ledgerState/utxo                       | `LedgerStateUTxOService`                       |
+
+**Additional Lifecycle Services:**
+
+| Service                     | Purpose                                      |
+| --------------------------- | -------------------------------------------- |
+| `AcquireLedgerStateService` | Acquire a ledger state snapshot for querying |
+| `ReleaseLedgerStateService` | Release an acquired ledger state snapshot    |
 
 ---
 
@@ -30,7 +79,7 @@ Key interfaces include:
 
 ## 2. Ledger State Query Implementations
 
-**Output:** Working implementations for all 21 Ogmios ledger state queries plus lifecycle services.
+**Output:** Working implementations for all 22 ledger state services (20 query services + 2 lifecycle services).
 
 **Evidence:**
 
@@ -109,32 +158,27 @@ The worker demonstrates the following ledger state queries:
 7. **queryLedgerState/stakePools** - Query stake pool details with filtering by pool ID (demonstrates `params` usage with DAVE pool: `pool1t6n7rysk6wzm9wqxda6zxpzmm3j6256fs3mp06dc26n6503hhj4`)
 8. **releaseLedgerState** - Release the acquired snapshot
 
-**Example Output:**
+**Example Output (Live Mainnet - January 2026):**
 
 ```
 --- Ledger State Query Demonstration ---
-Querying acquireLedgerState...
-  Ledger state acquired at point: {...}
-Querying queryLedgerState/tip...
-  Ledger Tip: Slot 123456789, Block ID abc123...
-Querying queryLedgerState/epoch...
-  Current Epoch: 530
-Querying queryLedgerState/protocolParameters...
-  Min Fee Coefficient: 44, Version: 10.0
-Querying queryLedgerState/treasuryAndReserves...
-  Treasury: 1500000000000000 lovelace, Reserves: 8000000000000000 lovelace
-Querying queryLedgerState/governanceProposals...
-  Active Governance Proposals: 5
-Querying queryLedgerState/stakePools (filtered by DAVE pool ID)...
-  [DAVE Pool]
-    Pool ID: pool1t6n7rysk6wzm9wqxda6zxpzmm3j6256fs3mp06dc26n6503hhj4
-    Margin: 1/50
-    Pledge: 100000000000 lovelace
-    Cost: 340000000 lovelace
-    Owners: 1
-    Relays: 2
-Querying releaseLedgerState...
-  Ledger state released
+[ServerHealth] Server tip: Slot 176169894
+[AcquireLedgerState] Ledger state acquired
+[QueryLedgerState/Epoch] Current Epoch: 605
+[QueryLedgerState/ProtocolParameters] Min Fee Coefficient: 44, Version: 10.0
+[QueryLedgerState/TreasuryAndReserves] Treasury: 1672567635217344 lovelace
+[QueryLedgerState/GovernanceProposals] Active Governance Proposals: 5
+[QueryLedgerState/StakePools] ══════════════════════════════════════════════════════════════
+[QueryLedgerState/StakePools]   DAVE Stake Pool - Live Mainnet Data
+[QueryLedgerState/StakePools] ══════════════════════════════════════════════════════════════
+[QueryLedgerState/StakePools]   Pool ID:        pool1t6n7rysk6wzm9wqxda6zxpzmm3j6256fs3mp06dc26n6503hhj4
+[QueryLedgerState/StakePools]   VRF Key Hash:   103dabdae2afee7a3c345ebf1b67c834db1ad1ecfafe593ce687f9ed0d5af046
+[QueryLedgerState/StakePools]   Pledge:         2,000 ADA
+[QueryLedgerState/StakePools]   Fixed Cost:     170 ADA
+[QueryLedgerState/StakePools]   Margin:         1/100 (1%)
+[QueryLedgerState/StakePools]   Reward Account: stake1uyu3y65jfjpyg7z2ul7sdzued3lvnadt2fg4sta3spreccqac626w
+[QueryLedgerState/StakePools] ══════════════════════════════════════════════════════════════
+[ReleaseLedgerState] Ledger state released
 --- Ledger State Query Demonstration Complete ---
 ```
 
@@ -147,6 +191,7 @@ Querying releaseLedgerState...
 **Evidence:**
 
 - Ledger State Query Tests: [`LedgerStateQueryTests.cs`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Tests/LedgerStateQueries/LedgerStateQueryTests.cs)
+- Test Report: [`test-report.md`](./test-report.md)
 
 **Ledger State Query Test Coverage:**
 
@@ -184,13 +229,24 @@ Querying releaseLedgerState...
 
 ## 6. Dependency Injection Registration
 
-**Output:** All ledger state query services registered in the service collection for DI.
+**Output:** All ledger state query services registered in the service collection for DI with opt-in helper method.
 
 **Evidence:**
 
 - DI Registration: [`ServiceCollectionExtensions.cs`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Services/Extensions/ServiceCollectionExtensions.cs)
 
-All 22 services are registered as singletons in the `RegisterLedgerStateQueryServices` extension method.
+All 22 services are registered as singletons via the `AddLedgerStateQueryServices()` extension method. Consumers can opt-in to ledger state query functionality independently:
+
+```csharp
+// Option 1: Register all Ogmios services (includes ledger state queries)
+services.AddOgmiosServices();
+
+// Option 2: Register only ledger state query services (opt-in)
+services.RegisterCoreServices();
+services.AddLedgerStateQueryServices();
+```
+
+This modular approach allows consumers to include only the services they need, reducing overhead for applications that don't require chain synchronization or mempool monitoring.
 
 ---
 
@@ -211,10 +267,29 @@ All 22 services are registered as singletons in the `RegisterLedgerStateQuerySer
 
 **Evidence:**
 
-- **OgmiosDotnetClient.Schema**: https://www.nuget.org/packages/OgmiosDotnetClient.Schema
-- **OgmiosDotnetClient.Services**: https://www.nuget.org/packages/OgmiosDotnetClient.Services
+- **OgmiosDotnetClient.Schema v6.13.1.3**: https://www.nuget.org/packages/OgmiosDotnetClient.Schema/6.13.1.3
+- **OgmiosDotnetClient.Services v6.13.1.3**: https://www.nuget.org/packages/OgmiosDotnetClient.Services/6.13.1.3
 
 Both packages include v6.13 schema support and all 22 ledger state query services.
+
+---
+
+## 9. Video Demonstration
+
+**Output:** End-to-end recorded YouTube demo showing a worker consuming several different queries in sequence and outputting typed results.
+
+**Evidence:**
+
+- **YouTube Demo**: [TODO: INSERT YOUTUBE LINK HERE]
+
+The video demonstrates:
+
+- Worker application connecting to live Cardano mainnet via Ogmios
+- Acquiring ledger state snapshot
+- Executing multiple ledger state queries in sequence
+- Outputting typed results including DAVE stake pool details
+- Releasing ledger state snapshot
+- All queries returning typed, strongly-structured .NET objects
 
 ---
 
@@ -222,11 +297,25 @@ Both packages include v6.13 schema support and all 22 ledger state query service
 
 The OgmiosDotnet library now provides complete ledger state query capabilities for the Cardano ecosystem, covering all 21 Ogmios v6.13 ledger state queries plus lifecycle management. The implementation includes:
 
-- 22 typed service implementations with consistent patterns
+- 21 query services + 2 lifecycle services (23 total)
 - 5 custom exception types for error handling
 - Comprehensive unit test coverage (25 tests)
-- Worker example demonstrating 7+ queries
-- Full dependency injection support
+- Worker example demonstrating 7+ queries against live mainnet
+- Full dependency injection support with opt-in registration
 - Updated documentation
 
 The functionality is production-ready and available via published NuGet packages.
+
+---
+
+## Evidence Links Summary
+
+| Evidence Type          | Link                                                                                                              |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| GitHub Repository      | https://github.com/ItsDaveB/OgmiosDotnet                                                                          |
+| Worker Example         | [`OgmiosWorker.cs`](https://github.com/ItsDaveB/OgmiosDotnet/blob/main/src/Ogmios.Example.Worker/OgmiosWorker.cs) |
+| Test Report            | [`test-report.md`](./test-report.md)                                                                              |
+| NuGet Schema Package   | https://www.nuget.org/packages/OgmiosDotnetClient.Schema                                                          |
+| NuGet Services Package | https://www.nuget.org/packages/OgmiosDotnetClient.Services                                                        |
+| Milestone Report       | This document                                                                                                     |
+| YouTube Demo           | [TODO: INSERT YOUTUBE LINK HERE]                                                                                  |

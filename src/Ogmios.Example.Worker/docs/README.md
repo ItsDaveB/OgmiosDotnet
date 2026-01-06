@@ -6,6 +6,7 @@ The **Ogmios Example Worker** demonstrates the capabilities of the Ogmios Client
 
 - Reading blocks from blockchain slots.
 - Accessing and monitoring mempool transactions.
+- **Querying ledger state data** (epoch, protocol parameters, treasury, governance proposals, stake pools).
 - Saving transaction data to a PostgreSQL database (in-memory in this example).
 
 This application is open-source and designed for easy cloning, use, and extension.
@@ -16,6 +17,12 @@ This application is open-source and designed for easy cloning, use, and extensio
 
 - **Chain Synchronization**: Reads and processes blocks from the blockchain.
 - **Mempool Monitoring**: Tracks mempool transactions and metadata.
+- **Ledger State Queries**: Demonstrates querying live ledger state data from the Cardano blockchain including:
+  - Current epoch and ledger tip
+  - Protocol parameters (fee coefficients, version)
+  - Treasury and reserves balances
+  - Active governance proposals
+  - Stake pool details (pledge, cost, margin, VRF key, reward account)
 - **Transaction Evaluation**: Demonstrates evaluating transactions to estimate execution units before submission.
 - **Transaction Submission**: Demonstrates submitting signed transactions to the Cardano blockchain.
 - **Data Persistence**: Saves transactions to an in-memory PostgreSQL database using Entity Framework.
@@ -75,9 +82,10 @@ This application is open-source and designed for easy cloning, use, and extensio
 
 1. **Chain Synchronization**: Processes blocks from blockchain slots and saves transaction data.
 2. **Mempool Monitoring**: Tracks live mempool transactions and metadata.
-3. **Transaction Evaluation**: Evaluates transactions with CBOR-encoded data to estimate execution budgets and validator information.
-4. **Transaction Submission**: Submits CBOR-encoded signed transactions to the Cardano blockchain and returns the transactionId.
-5. **Database Integration**: Persists transaction data in a PostgreSQL database.
+3. **Ledger State Queries**: Acquires ledger state and queries epoch, protocol parameters, treasury/reserves, governance proposals, and stake pool details.
+4. **Transaction Evaluation**: Evaluates transactions with CBOR-encoded data to estimate execution budgets and validator information.
+5. **Transaction Submission**: Submits CBOR-encoded signed transactions to the Cardano blockchain and returns the transactionId.
+6. **Database Integration**: Persists transaction data in a PostgreSQL database.
 
 ---
 

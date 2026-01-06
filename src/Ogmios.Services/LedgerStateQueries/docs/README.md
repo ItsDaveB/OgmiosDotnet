@@ -4,6 +4,55 @@ Focused services that extract specific pieces of Cardano ledger-state informatio
 
 This document lists the services implemented under Ogmios.Services.LedgerStateQueries and the purpose of each. All services operate against an Ogmios "AcquireLedgerState" snapshot and extract specific pieces of ledger-state data (see: https://ogmios.dev/api/#operation-publish-/?AcquireLedgerState).
 
+## Registration
+
+Ledger state query services can be registered via dependency injection using the extension methods provided:
+
+```csharp
+// Option 1: Register all Ogmios services (includes ledger state queries)
+services.AddOgmiosServices();
+
+// Option 2: Register only ledger state query services (opt-in)
+services.RegisterCoreServices();
+services.AddLedgerStateQueryServices();
+```
+
+The `AddLedgerStateQueryServices()` method registers all 22 ledger state query services as singletons, allowing consumers to opt-in to just the ledger state functionality without chain synchronization or mempool monitoring.
+
+## Usage Example
+
+The following example demonstrates acquiring ledger state, querying stake pool details, and releasing the state:
+
+```csharp
+// Acquire ledger state at the current tip
+await acquireLedgerStateService.AcquireAsync(context, cancellationToken: stoppingToken);
+
+// Query current epoch
+var epochResponse = await ledgerStateEpochService.GetEpochAsync(context, cancellationToken: stoppingToken);
+Console.WriteLine($"Current Epoch: {epochResponse.AsQueryLedgerStateEpochResponse.Result}");
+
+// Query a specific stake pool by ID
+var stakePoolIdEntity = Generated.StakePoolId.Parse("\"pool1t6n7rysk6wzm9wqxda6zxpzmm3j6256fs3mp06dc26n6503hhj4\"");
+var poolIdParam = Generated.Ogmios.QueryLedgerStateStakePools.ParamsEntity.RequiredIdArray.RequiredId.Create(stakePoolIdEntity);
+var poolIdArray = Generated.Ogmios.QueryLedgerStateStakePools.ParamsEntity.RequiredIdArray.FromRange([poolIdParam]);
+var paramsEntity = Generated.Ogmios.QueryLedgerStateStakePools.ParamsEntity.Create(stakePools: poolIdArray);
+
+var stakePoolRequest = Generated.Ogmios.QueryLedgerStateStakePools.Create(
+    jsonrpc: Generated.Ogmios.QueryLedgerStateStakePools.JsonrpcEntity.EnumValues.Value20,
+    method: Generated.Ogmios.QueryLedgerStateStakePools.MethodEntity.EnumValues.QueryLedgerStateStakePools,
+    id: string.Empty,
+    paramsValue: paramsEntity);
+
+var stakePoolResponse = await ledgerStateStakePoolsService.GetStakePoolsAsync(context, stakePoolRequest, cancellationToken: stoppingToken);
+var pool = stakePoolResponse.AsQueryLedgerStateStakePoolsResponse.Result.FirstOrDefault();
+Console.WriteLine($"Pool Pledge: {pool.Value.Pledge.Ada.Lovelace} lovelace");
+
+// Release ledger state when done
+await releaseLedgerStateService.ReleaseAsync(context, cancellationToken: stoppingToken);
+```
+
+## Available Services
+
 - IAcquireLedgerStateService
 
   - Purpose: Provide access to the raw AcquireLedgerState snapshot and manage its lifecycle (acquire, cache, validate) so other services can read a consistent snapshot.
