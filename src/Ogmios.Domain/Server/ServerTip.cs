@@ -1,8 +1,15 @@
+using System.Text.Json.Serialization;
+
 namespace Ogmios.Domain.Server;
 
 public class ServerTip
 {
-    public string? Block { get; set; }
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    [JsonPropertyName("slot")]
     public ulong Slot { get; set; }
-    public ulong Epoch { get; set; }
+
+    [JsonPropertyName("height")]
+    public ulong Height { get; set; }
 }

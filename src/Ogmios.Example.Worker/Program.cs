@@ -1,5 +1,6 @@
 using Ogmios.Example.Worker;
 using Ogmios.Example.Worker.ChainSynchronizationHandlers;
+using Ogmios.Example.Worker.Examples;
 using Ogmios.Services.ChainSynchronization;
 using Ogmios.Services.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,12 @@ var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddOgmiosServices();
 builder.Services.AddSingleton<IChainSynchronizationMessageHandlers, ChainSynchronizationMessageHandlers>();
 builder.Services.AddHostedService<OgmiosWorker>();
+
+builder.Services.AddSingleton<LedgerStateQueriesExample>();
+builder.Services.AddSingleton<ChainSynchronizationExample>();
+builder.Services.AddSingleton<TransactionEvaluationExample>();
+builder.Services.AddSingleton<TransactionSubmissionExample>();
+builder.Services.AddSingleton<MemPoolMonitoringExample>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseInMemoryDatabase("cardano"), ServiceLifetime.Singleton);
