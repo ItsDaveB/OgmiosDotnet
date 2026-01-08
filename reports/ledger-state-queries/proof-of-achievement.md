@@ -267,10 +267,10 @@ This modular approach allows consumers to include only the services they need, r
 
 **Evidence:**
 
-- **OgmiosDotnetClient.Schema v6.13.1.3**: https://www.nuget.org/packages/OgmiosDotnetClient.Schema/6.13.1.3
+- **OgmiosDotnetClient.Schema v6.13**: https://www.nuget.org/packages/OgmiosDotnetClient.Schema/6.13.0
 - **OgmiosDotnetClient.Services v6.13.1.3**: https://www.nuget.org/packages/OgmiosDotnetClient.Services/6.13.1.3
 
-Both packages include v6.13 schema support and all 22 ledger state query services.
+Ogmios v6.13 schema support is contained in OgmiosDotnetClient.Schema v6.13, and all 22 ledger state query services is contained in OgmiosDotnetClient.Services v6.13.1.3.
 
 ---
 
