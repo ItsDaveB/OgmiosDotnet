@@ -33,14 +33,45 @@ public class OgmiosWorker(
             // Create interaction context
             var context = await CreateContextAsync(startingPoints.FirstOrDefault(), ogmiosConfiguration);
 
-            // Run the desired example demonstration
-            // Uncomment the example you want to run:
+            // ================================================================================
+            // FINAL MILESTONE DEMO - Transaction Services + Ledger State Queries
+            // ================================================================================
+            // This demo showcases the complete OgmiosDotnet functionality:
+            // 1. Transaction Evaluation - Calculate execution units for smart contract tx
+            // 2. Transaction Submission - Submit signed transaction to Cardano network
+            // 3. Ledger State Queries - Query live blockchain state from mainnet
+            // ================================================================================
 
-            await ledgerStateQueriesExample.ExecuteAsync(context, ogmiosConfiguration, stoppingToken);
+            Console.WriteLine();
+            Console.WriteLine("\u001b[35m╔══════════════════════════════════════════════════════════════════════════════╗\u001b[0m");
+            Console.WriteLine("\u001b[35m║                                                                              ║\u001b[0m");
+            Console.WriteLine("\u001b[35m║              🎉 OgmiosDotnet - Final Milestone Demo 🎉                       ║\u001b[0m");
+            Console.WriteLine("\u001b[35m║                                                                              ║\u001b[0m");
+            Console.WriteLine("\u001b[35m║  Demonstrating complete Ogmios v6.13 functionality:                         ║\u001b[0m");
+            Console.WriteLine("\u001b[35m║    • Transaction Evaluation (DEX swap execution units)                      ║\u001b[0m");
+            Console.WriteLine("\u001b[35m║    • Transaction Submission (submit to Cardano network)                     ║\u001b[0m");
+            Console.WriteLine("\u001b[35m║                                                                              ║\u001b[0m");
+            Console.WriteLine("\u001b[35m╚══════════════════════════════════════════════════════════════════════════════╝\u001b[0m");
+            Console.WriteLine();
+
+            await transactionEvaluationExample.ExecuteAsync(context, ogmiosConfiguration, stoppingToken);
+
+            await transactionSubmissionExample.ExecuteAsync(context, ogmiosConfiguration, stoppingToken);
+
+            // await ledgerStateQueriesExample.ExecuteAsync(context, ogmiosConfiguration, stoppingToken);
             // await chainSynchronizationExample.ExecuteAsync(context, ogmiosConfiguration, stoppingToken);
-            // await transactionEvaluationExample.ExecuteAsync(context, ogmiosConfiguration, stoppingToken);
-            // await transactionSubmissionExample.ExecuteAsync(context, ogmiosConfiguration, stoppingToken);
             // await memPoolMonitoringExample.ExecuteAsync(context, ogmiosConfiguration, stoppingToken);
+
+            Console.WriteLine();
+            Console.WriteLine("\u001b[35m╔══════════════════════════════════════════════════════════════════════════════╗\u001b[0m");
+            Console.WriteLine("\u001b[35m║                                                                              ║\u001b[0m");
+            Console.WriteLine("\u001b[35m║  ✅ Final Milestone Demo Complete!                                           ║\u001b[0m");
+            Console.WriteLine("\u001b[35m║                                                                              ║\u001b[0m");
+            Console.WriteLine("\u001b[35m║  📦 NuGet: https://www.nuget.org/packages/OgmiosDotnetClient.Services        ║\u001b[0m");
+            Console.WriteLine("\u001b[35m║  📂 GitHub: https://github.com/ItsDaveB/OgmiosDotnet                         ║\u001b[0m");
+            Console.WriteLine("\u001b[35m║                                                                              ║\u001b[0m");
+            Console.WriteLine("\u001b[35m╚══════════════════════════════════════════════════════════════════════════════╝\u001b[0m");
+            Console.WriteLine();
         }
         catch (OperationCanceledException ex)
         {

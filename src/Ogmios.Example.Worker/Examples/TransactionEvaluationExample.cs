@@ -13,21 +13,28 @@ public class TransactionEvaluationExample(
     ITransactionEvaluationService transactionEvaluationService) : IExample
 {
     public string Name => "Transaction Evaluation";
+    private const string transactionCborHex = "";
 
     public async Task ExecuteAsync(InteractionContext context, OgmiosConfiguration ogmiosConfiguration, CancellationToken cancellationToken)
     {
+        Console.WriteLine();
+        Console.WriteLine("\u001b[35m╔══════════════════════════════════════════════════════════════════════════════╗\u001b[0m");
+        Console.WriteLine("\u001b[35m║              OgmiosDotnet - Transaction Evaluation Demo                      ║\u001b[0m");
+        Console.WriteLine("\u001b[35m║                                                                              ║\u001b[0m");
+        Console.WriteLine("\u001b[35m║  🔄 Transaction: DEX Order Cancellation (executes validator)                ║\u001b[0m");
+        Console.WriteLine("\u001b[35m║  🌐 Network: Cardano MAINNET                                                 ║\u001b[0m");
+        Console.WriteLine("\u001b[35m║  📦 Library: OgmiosDotnet v6.13.1.3                                          ║\u001b[0m");
+        Console.WriteLine("\u001b[35m╚══════════════════════════════════════════════════════════════════════════════╝\u001b[0m");
+        Console.WriteLine();
         Console.WriteLine("\u001b[33m--- Transaction Evaluation Demonstration ---\u001b[0m");
 
-        // Note: Replace with a real CBOR-encoded transaction for actual evaluation
-        var cborRawForEvaluation = "CBORHex";
-
-        Console.WriteLine($"\u001b[36m[TransactionEvaluation] Evaluating transaction...\u001b[0m");
-        Console.WriteLine($"\u001b[33m[TransactionEvaluation] Note: Using placeholder CBOR. Replace with real transaction for actual evaluation.\u001b[0m");
+        Console.WriteLine($"\u001b[36m[TransactionEvaluation] CBOR length: {transactionCborHex.Length} characters\u001b[0m");
+        Console.WriteLine($"\u001b[36m[TransactionEvaluation] Sending transaction to Ogmios for evaluation...\u001b[0m");
 
         try
         {
             var cborToEvaluate = Generated.Ogmios.EvaluateTransaction.RequiredTransaction.RequiredCbor.Create(
-                Generated.Ogmios.EvaluateTransaction.RequiredTransaction.RequiredCbor.CborSerializedSignedTransactionBase16.FromAny(cborRawForEvaluation));
+                Generated.Ogmios.EvaluateTransaction.RequiredTransaction.RequiredCbor.CborSerializedSignedTransactionBase16.FromAny(transactionCborHex));
 
             var evaluationResponse = await transactionEvaluationService.EvaluateTransactionAsync(
                 context,
@@ -36,20 +43,32 @@ public class TransactionEvaluationExample(
 
             var successResponse = evaluationResponse.AsEvaluateTransactionSuccess.Result;
 
-            var budget = successResponse.FirstOrDefault().Budget;
-            var validator = successResponse.FirstOrDefault().Validator;
+            Console.WriteLine($"\u001b[32m[TransactionEvaluation] ══════════════════════════════════════════════════════════════\u001b[0m");
+            Console.WriteLine($"\u001b[32m[TransactionEvaluation]   ✅ Transaction Evaluation Successful!\u001b[0m");
+            Console.WriteLine($"\u001b[32m[TransactionEvaluation] ══════════════════════════════════════════════════════════════\u001b[0m");
 
-            Console.WriteLine($"\u001b[32m[TransactionEvaluation] Budget: {budget}\u001b[0m");
-            Console.WriteLine($"\u001b[32m[TransactionEvaluation] Validator: {validator}\u001b[0m");
+            var validatorIndex = 0;
+            foreach (var result in successResponse)
+            {
+                var budget = result.Budget;
+                var validator = result.Validator;
+                Console.WriteLine($"\u001b[32m[TransactionEvaluation]   Validator [{validatorIndex}]: {validator}\u001b[0m");
+                Console.WriteLine($"\u001b[32m[TransactionEvaluation]   Memory:      {budget.Memory} units\u001b[0m");
+                Console.WriteLine($"\u001b[32m[TransactionEvaluation]   CPU:         {budget.Cpu} steps\u001b[0m");
+                Console.WriteLine($"\u001b[32m[TransactionEvaluation] ──────────────────────────────────────────────────────────────\u001b[0m");
+                validatorIndex++;
+            }
 
-            logger.LogInformation("Transaction evaluation completed. Budget: {Budget}, Validator: {Validator}", budget, validator);
+            logger.LogInformation("Transaction evaluation completed successfully with {ValidatorCount} validator(s)", successResponse.Count());
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"\u001b[33m[TransactionEvaluation] Error: {ex.Message}\u001b[0m");
-            Console.WriteLine($"\u001b[33m[TransactionEvaluation] This is expected with placeholder CBOR.\u001b[0m");
+            Console.WriteLine($"\u001b[31m[TransactionEvaluation] ❌ Evaluation Failed!\u001b[0m");
+            Console.WriteLine($"\u001b[31m[TransactionEvaluation] Error: {ex.Message}\u001b[0m");
+            logger.LogError(ex, "Transaction evaluation failed");
         }
 
         Console.WriteLine("\u001b[33m--- Transaction Evaluation Demonstration Complete ---\u001b[0m");
+        Console.WriteLine();
     }
 }

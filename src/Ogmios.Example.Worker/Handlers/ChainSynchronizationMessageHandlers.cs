@@ -2,7 +2,7 @@ using Generated;
 using Ogmios.Example.Database.Services;
 using Ogmios.Services.ChainSynchronization;
 
-namespace Ogmios.Example.Worker.ChainSynchronizationHandlers;
+namespace Ogmios.Example.Worker.Handlers;
 
 public class ChainSynchronizationMessageHandlers(ITransactionService transactionService) : IChainSynchronizationMessageHandlers
 {
