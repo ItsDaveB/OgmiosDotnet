@@ -23,12 +23,19 @@ The final closeout video demonstrates the complete functionality delivered acros
    - Provides CardanoScan link for on-chain verification
 
 3. **Ledger State Queries**
+
    - Worker application connecting to Cardano mainnet via Demeter.run hosted Ogmios
    - Acquiring ledger state snapshot at current tip
    - Querying current epoch, protocol parameters, treasury & reserves
    - Querying governance proposals
    - Stake pool details retrieval (DAVE pool)
    - Live mainnet data displayed in console output
+
+4. **File Structure**
+   - Schema definitions
+   - Documentation
+   - Examples
+   - Service Interfaces & Implementations
 
 ### Example Files
 
