@@ -2,7 +2,7 @@
 
 ## Final Closeout Video
 
-**YouTube Link**: https://youtu.be/pRiY4hZm7S4
+**YouTube Link**: TO BE UPDATED
 
 ### Video Contents
 
