@@ -145,7 +145,7 @@ The Cardano community should be excited because this project significantly expan
 
 ## Link to Close-out Video
 
-**YouTube Link:** TO BE UPDATED
+**YouTube Link:** https://youtu.be/2yyHs7SiPrg
 
 ### Video Contents (2-5 minutes)
 
