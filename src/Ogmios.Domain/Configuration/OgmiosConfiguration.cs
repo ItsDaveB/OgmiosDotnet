@@ -6,5 +6,6 @@ namespace Ogmios.Domain
         public int Port { get; set; }
         public int MaxBlocksPerSecond { get; set; } = 100;
         public bool Tls { get; set; } = true;
+        public string SslValidation { get; set; } = "Auto";
     }
 }

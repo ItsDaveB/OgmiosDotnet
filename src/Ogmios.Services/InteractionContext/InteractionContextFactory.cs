@@ -13,9 +13,32 @@ public class InteractionContextFactory(IWebSocketService webSocketService, IServ
             throw new ArgumentException("Ogmios Host configuration is missing or empty.");
         }
 
-        var config = new ConnectionConfig { Host = ogmiosConfiguration.Host, Port = ogmiosConfiguration.Port, Tls = ogmiosConfiguration.Tls };
+        var sslValidation = ParseSslValidation(ogmiosConfiguration.SslValidation);
+
+        var config = new ConnectionConfig
+        {
+            Host = ogmiosConfiguration.Host,
+            Port = ogmiosConfiguration.Port,
+            Tls = ogmiosConfiguration.Tls,
+            SslValidation = sslValidation
+        };
+
         var service = new InteractionContextService(webSocketService, serverHealthService);
 
         return service.CreateInteractionContextAsync(connectionName, startingPoint, config);
+    }
+
+    private static SslCertificateValidation ParseSslValidation(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return SslCertificateValidation.Auto;
+
+        return value.ToLowerInvariant() switch
+        {
+            "strict" => SslCertificateValidation.Strict,
+            "bypass" => SslCertificateValidation.Bypass,
+            "auto" => SslCertificateValidation.Auto,
+            _ => SslCertificateValidation.Auto
+        };
     }
 }

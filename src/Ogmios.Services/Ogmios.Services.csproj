@@ -7,7 +7,7 @@
     <RootNamespace>Ogmios.Services</RootNamespace>
     
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>6.13.1.3</Version>
+    <Version>6.13.1.4</Version>
     <Authors>Dave B</Authors>
     <PackageId>OgmiosDotnetClient.Services</PackageId>
     <Description>A set of services and extensions for integrating Ogmios functionality, including chain synchronization, memory pool monitoring, transaction submission, transaction evaluation, ledger state queries, and server health monitoring.</Description>

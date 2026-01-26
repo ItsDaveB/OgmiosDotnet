@@ -1,5 +1,6 @@
 using System.Net.WebSockets;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Ogmios.Domain;
 
 namespace Ogmios.Services.ChainSynchronization;
@@ -7,10 +8,31 @@ namespace Ogmios.Services.ChainSynchronization;
 public class WebSocketService : IWebSocketService
 {
     private const int BufferSize = 8192;
+    private readonly ILogger<WebSocketService>? _logger;
+
+    public WebSocketService()
+    {
+    }
+
+    public WebSocketService(ILogger<WebSocketService> logger)
+    {
+        _logger = logger;
+    }
 
     public async Task<IClientWebSocket> ConnectAsync(Uri addressWebSocket, ConnectionConfig connectionConfig, CancellationToken cancellationToken = default)
     {
-        var socket = new ClientWebSocketWrapper();
+        var hostname = addressWebSocket.Host;
+        var socket = ClientWebSocketWrapper.Create(hostname, connectionConfig.SslValidation);
+
+        // Log if SSL bypass is being used
+        if (ClientWebSocketWrapper.HostnameRequiresSslBypass(hostname) &&
+            connectionConfig.SslValidation != SslCertificateValidation.Strict)
+        {
+            _logger?.LogDebug(
+                "SSL certificate validation bypassed for hostname '{Hostname}' (contains non-standard characters)",
+                hostname);
+        }
+
         socket.Options.KeepAliveInterval = TimeSpan.FromSeconds(connectionConfig.KeepAliveInterval);
         socket.Options.SetBuffer(connectionConfig.MaxPayload, connectionConfig.MaxPayload);
 
