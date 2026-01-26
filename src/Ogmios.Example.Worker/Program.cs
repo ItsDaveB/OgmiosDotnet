@@ -1,5 +1,5 @@
 using Ogmios.Example.Worker;
-using Ogmios.Example.Worker.ChainSynchronizationHandlers;
+using Ogmios.Example.Worker.Handlers;
 using Ogmios.Example.Worker.Examples;
 using Ogmios.Services.ChainSynchronization;
 using Ogmios.Services.Extensions;
