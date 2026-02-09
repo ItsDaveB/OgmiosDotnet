@@ -8,7 +8,7 @@
 | NuGet Package          | https://www.nuget.org/packages/OgmiosDotnetClient.Services      |
 | GitHub Release         | https://github.com/ItsDaveB/OgmiosDotnet/releases/tag/v6.13.1.3 |
 | Test Report            | [test-report.md](./test-report.md)                              |
-| Final Closeout Video   | https://youtu.be/2yyHs7SiPrg                                    |
+| Final Closeout Video   | https://youtu.be/BRPxhRNRwJc                                    |
 | Final Close-Out Report | [close-out-report.md](./close-out-report.md)                    |
 | Documentation (README) | https://github.com/ItsDaveB/OgmiosDotnet/blob/main/README.md    |
 
@@ -40,5 +40,5 @@
 
 ### 6. Final Closeout Video
 
-- **Video**: https://youtu.be/2yyHs7SiPrg
+- **Video**: https://youtu.be/BRPxhRNRwJc
 - **Details**: [demo-videos.md](./demo-videos.md)

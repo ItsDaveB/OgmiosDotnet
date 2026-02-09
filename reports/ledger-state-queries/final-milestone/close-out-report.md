@@ -145,31 +145,27 @@ The Cardano community should be excited because this project significantly expan
 
 ## Link to Close-out Video
 
-**YouTube Link:** https://youtu.be/2yyHs7SiPrg
+**YouTube Link:** https://youtu.be/BRPxhRNRwJc
 
 ### Video Contents (2-5 minutes)
 
 The close-out video demonstrates:
 
 1. **Transaction Evaluation**:
-
    - Evaluating a Minswap DEX Cancel Order transaction
    - Smart contract validator execution unit calculation
    - Returns CPU steps and memory units for the Plutus validator
 
 2. **Transaction Submission**:
-
    - Submitting a real signed transaction to Cardano mainnet
    - DEX order placement: 5 ADA → HOSKY token swap
    - Returns transaction ID upon successful submission
 
 3. **On-Chain Verification**:
-
    - Viewing the submitted transaction in CardanoScan explorer
    - Confirming the transaction was successfully included on-chain
 
 4. **Ledger State Queries**:
-
    - Worker application connecting to Cardano mainnet via Demeter.run hosted Ogmios
    - Acquiring ledger state snapshot at current tip
    - Querying current epoch, protocol parameters, treasury & reserves

@@ -2,28 +2,25 @@
 
 ## Final Closeout Video
 
-**YouTube Link**: https://youtu.be/2yyHs7SiPrg
+**YouTube Link**: https://youtu.be/BRPxhRNRwJc
 
 ### Video Contents
 
 The final closeout video demonstrates the complete functionality delivered across all milestones:
 
 1. **Transaction Evaluation - Minswap DEX Swap Cancel**
-
    - Evaluates a real Minswap DEX Aggregator Cancel Order transaction
    - Demonstrates smart contract validator execution unit calculation
    - Returns CPU steps and memory units for the validator
    - Uses CBOR-encoded transaction against Cardano mainnet
 
 2. **Transaction Submission - Minswap DEX ADA to HOSKY Swap**
-
    - Submits a real signed transaction to Cardano mainnet
    - DEX order placement: 5 ADA → HOSKY token swap
    - Returns transaction ID upon successful submission
    - Provides CardanoScan link for on-chain verification
 
 3. **Ledger State Queries**
-
    - Worker application connecting to Cardano mainnet via Demeter.run hosted Ogmios
    - Acquiring ledger state snapshot at current tip
    - Querying current epoch, protocol parameters, treasury & reserves
