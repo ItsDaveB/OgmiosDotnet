@@ -32,13 +32,13 @@ jobs:
           dotnet build ./src/Ogmios.Services/Ogmios.Services.csproj --configuration Release --no-restore
 
       - name: Pack Ogmios.Domain
-        run: dotnet pack ./src/Ogmios.Domain/Ogmios.Domain.csproj --configuration Release --output ./nupkg
+        run: dotnet pack ./src/Ogmios.Domain/Ogmios.Domain.csproj --configuration Release --no-build --no-restore --output ./nupkg
 
       - name: Pack Ogmios.Services
-        run: dotnet pack ./src/Ogmios.Services/Ogmios.Services.csproj --configuration Release --output ./nupkg
+        run: dotnet pack ./src/Ogmios.Services/Ogmios.Services.csproj --configuration Release --no-build --no-restore --output ./nupkg
 
       - name: Pack Ogmios.Schema
-        run: dotnet pack ./src/Ogmios.Schema/Ogmios.Schema.csproj --configuration Release --output ./nupkg
+        run: dotnet pack ./src/Ogmios.Schema/Ogmios.Schema.csproj --configuration Release --no-build --no-restore --output ./nupkg
 
       - name: Publish to NuGet
         env:
