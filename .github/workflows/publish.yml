@@ -17,13 +17,19 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: |
+          dotnet restore ./src/Ogmios.Domain/Ogmios.Domain.csproj
+          dotnet restore ./src/Ogmios.Schema/Ogmios.Schema.csproj
+          dotnet restore ./src/Ogmios.Services/Ogmios.Services.csproj
 
-      - name: Build the project
-        run: dotnet build --configuration Release
+      - name: Build the projects
+        run: |
+          dotnet build ./src/Ogmios.Domain/Ogmios.Domain.csproj --configuration Release --no-restore
+          dotnet build ./src/Ogmios.Schema/Ogmios.Schema.csproj --configuration Release --no-restore
+          dotnet build ./src/Ogmios.Services/Ogmios.Services.csproj --configuration Release --no-restore
 
       - name: Pack Ogmios.Domain
         run: dotnet pack ./src/Ogmios.Domain/Ogmios.Domain.csproj --configuration Release --output ./nupkg
