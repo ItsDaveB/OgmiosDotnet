@@ -20,6 +20,22 @@ public class BlockService(IWebSocketService webSocketService) : IBlockService
         }
 
         var result = ParsedValue<Generated.Ogmios.NextBlockResponse>.Parse(response);
+        await ProcessParsedBlockAsync(result, messageHandlers);
+    }
+
+    public async Task HandleNextBlockAsync(ReadOnlyMemory<byte> utf8Response, IChainSynchronizationMessageHandlers messageHandlers)
+    {
+        if (utf8Response.Length == 0)
+        {
+            return;
+        }
+
+        var result = ParsedValue<Generated.Ogmios.NextBlockResponse>.Parse(utf8Response);
+        await ProcessParsedBlockAsync(result, messageHandlers);
+    }
+
+    private static async Task ProcessParsedBlockAsync(ParsedValue<Generated.Ogmios.NextBlockResponse> result, IChainSynchronizationMessageHandlers messageHandlers)
+    {
         result.Instance.Result.TryGetProperty("direction", out var direction);
 
         switch ((string)direction.AsString)

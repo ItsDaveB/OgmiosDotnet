@@ -6,6 +6,7 @@ using Ogmios.Example.Database.Infrastructure.Database;
 using Ogmios.Example.Database.Infrastructure.Database.Repositories;
 using AutoMapper;
 using Ogmios.Example.Worker.Mappers;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Ogmios.Services.MemoryPoolMonitoring;
 using Ogmios.Domain;
@@ -25,7 +26,7 @@ public class MemoryPoolMonitoringDatabaseTests : IDisposable
 
         _context = new ApplicationDbContext(options);
         _transactionRepository = new TransactionRepository(_context);
-        _transactionService = new TransactionService(_transactionRepository, new Mapper(new MapperConfiguration(cfg => cfg.AddProfile<TransactionMapping>())));
+        _transactionService = new TransactionService(_transactionRepository, new Mapper(new MapperConfiguration(cfg => cfg.AddProfile<TransactionMapping>(), NullLoggerFactory.Instance)));
         _memoryPoolMonitoringService = new Mock<IMemoryPoolMonitoringService>();
     }
 

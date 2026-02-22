@@ -1,5 +1,4 @@
 using System.Net.WebSockets;
-using System.Text;
 using System.Collections.Concurrent;
 using Ogmios.Domain;
 
@@ -7,16 +6,15 @@ namespace Ogmios.Services.ChainSynchronization
 {
     public class ChainSynchronizationClientService(IChainSynchronizationMessageHandlers messageHandlers, IIntersectionService intersectionService, IBlockService blockService) : IChainSynchronizationClientService
     {
-        public readonly BlockingCollection<(string, Domain.InteractionContext)> MessageQueue = new(boundedCapacity: 1000);
+        public readonly BlockingCollection<(byte[], Domain.InteractionContext)> MessageQueue = new(boundedCapacity: 1000);
         private readonly IChainSynchronizationMessageHandlers _messageHandlers = messageHandlers ?? throw new ArgumentNullException(nameof(messageHandlers));
         private readonly IIntersectionService _intersectionService = intersectionService ?? throw new ArgumentNullException(nameof(intersectionService));
         private readonly IBlockService _blockService = blockService ?? throw new ArgumentNullException(nameof(blockService));
-        private readonly SemaphoreSlim _rateLimiter = new(1, 1);
 
         public async Task ResumeListeningAsync(Domain.InteractionContext interactionContext, CancellationToken cancellationToken)
         {
-            var buffer = new byte[8192]; // 8 KB buffer size for WebSocket messages
-            var messageBuilder = new StringBuilder();
+            var buffer = new byte[65536]; // 64 KB buffer to reduce fragmented reads for large Cardano blocks
+            using var messageStream = new MemoryStream();
 
             while (!cancellationToken.IsCancellationRequested && interactionContext.Socket.State == WebSocketState.Open)
             {
@@ -26,13 +24,13 @@ namespace Ogmios.Services.ChainSynchronization
 
                     if (result.MessageType == WebSocketMessageType.Text)
                     {
-                        messageBuilder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                        messageStream.Write(buffer, 0, result.Count);
 
                         if (result.EndOfMessage)
                         {
-                            var message = messageBuilder.ToString();
-                            MessageQueue.Add((message, interactionContext), cancellationToken);
-                            messageBuilder.Clear();
+                            var messageBytes = messageStream.ToArray();
+                            MessageQueue.Add((messageBytes, interactionContext), cancellationToken);
+                            messageStream.SetLength(0);
                         }
                     }
                     else if (result.MessageType == WebSocketMessageType.Close)
@@ -54,29 +52,16 @@ namespace Ogmios.Services.ChainSynchronization
 
         public async Task ProcessMessagesAsync(int maxBlocksPerSecond, CancellationToken cancellationToken)
         {
-            var timeWindow = TimeSpan.FromSeconds(1.0 / maxBlocksPerSecond);
-
             try
             {
                 foreach (var item in MessageQueue.GetConsumingEnumerable(cancellationToken))
                 {
-                    var (message, context) = item;
-                    await _rateLimiter.WaitAsync(cancellationToken);
+                    var (messageBytes, context) = item;
 
-                    try
-                    {
-
-                        await ProcessBlockMessageAsync(message);
-                        await RequestNextBlockAsync(context);
-                    }
-                    finally
-                    {
-                        await Task.Delay(timeWindow, cancellationToken);
-                        _rateLimiter.Release();
-                    }
+                    await ProcessBlockMessageAsync(messageBytes);
+                    await RequestNextBlockAsync(context);
                 }
             }
-
             catch (OperationCanceledException)
             {
                 Console.WriteLine("Processing cancelled.");
@@ -87,11 +72,11 @@ namespace Ogmios.Services.ChainSynchronization
             }
         }
 
-        private async Task ProcessBlockMessageAsync(string message)
+        private async Task ProcessBlockMessageAsync(byte[] messageBytes)
         {
             try
             {
-                await _blockService.HandleNextBlockAsync(message, _messageHandlers);
+                await _blockService.HandleNextBlockAsync(new ReadOnlyMemory<byte>(messageBytes), _messageHandlers);
             }
             catch (Exception ex)
             {

@@ -74,8 +74,8 @@ namespace Ogmios.Tests.ChainSynchronization
 
             // Assert
             Assert.Single(_service.MessageQueue);
-            var (queuedMessage, context) = _service.MessageQueue.First();
-            Assert.Equal(message, queuedMessage);
+            var (queuedBytes, context) = _service.MessageQueue.First();
+            Assert.Equal(message, Encoding.UTF8.GetString(queuedBytes));
             Assert.Equal(interactionContext, context);
 
             mockSocket.Verify(
@@ -180,7 +180,7 @@ namespace Ogmios.Tests.ChainSynchronization
 
             // Assert
             _mockBlockService.Verify(
-                x => x.HandleNextBlockAsync(message, _mockMessageHandlers.Object),
+                x => x.HandleNextBlockAsync(It.Is<ReadOnlyMemory<byte>>(b => Encoding.UTF8.GetString(b.ToArray()) == message), _mockMessageHandlers.Object),
                 Times.Once,
                 "Expected HandleNextBlockAsync to be called once with the correct message and handlers."
             );
@@ -223,10 +223,10 @@ namespace Ogmios.Tests.ChainSynchronization
                 });
 
             // Setup the message handlers to log the order of message processing
-            _mockBlockService.Setup(x => x.HandleNextBlockAsync(It.IsAny<string>(), It.IsAny<IChainSynchronizationMessageHandlers>()))
-                .Callback<string, IChainSynchronizationMessageHandlers>((message, _) =>
+            _mockBlockService.Setup(x => x.HandleNextBlockAsync(It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<IChainSynchronizationMessageHandlers>()))
+                .Callback<ReadOnlyMemory<byte>, IChainSynchronizationMessageHandlers>((bytes, _) =>
                 {
-                    messageLog.Add(message);
+                    messageLog.Add(Encoding.UTF8.GetString(bytes.Span));
                 })
                 .Returns(Task.CompletedTask);
 

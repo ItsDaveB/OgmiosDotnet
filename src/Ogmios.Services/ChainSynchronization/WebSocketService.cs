@@ -7,7 +7,7 @@ namespace Ogmios.Services.ChainSynchronization;
 
 public class WebSocketService : IWebSocketService
 {
-    private const int BufferSize = 8192;
+    private const int BufferSize = 65536;
     private readonly ILogger<WebSocketService>? _logger;
 
     public WebSocketService()
