@@ -35,7 +35,7 @@ This application is open-source and designed for easy cloning, use, and extensio
 
 ### Prerequisites
 
-- .NET SDK 9.0 or later.
+- .NET SDK 10.0 or later.
 - PostgreSQL database.
 - Access to an Ogmios server or mock data.
 
@@ -50,7 +50,6 @@ This application is open-source and designed for easy cloning, use, and extensio
 
 2. **Configure the application**:
    Update `appsettings.json` with:
-
    - **Ogmios Server**:
      ```json
      "Ogmios": {
