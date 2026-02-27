@@ -33,7 +33,7 @@ To use **OgmiosDotnetClient**, you need:
 
 ### Current Version
 
-Ogmios v6.13.0
+Ogmios v6.14.0
 
 ## Integration Steps
 

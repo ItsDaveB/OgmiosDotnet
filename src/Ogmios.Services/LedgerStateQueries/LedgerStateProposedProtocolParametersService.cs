@@ -9,17 +9,17 @@ namespace Ogmios.Services.LedgerStateQueries
     {
         private readonly IWebSocketService _webSocketService = webSocketService ?? throw new ArgumentNullException(nameof(webSocketService));
 
-        public async Task<Generated.Ogmios.QueryLedgerStateProposedProtocolParametersResponseEntity> GetProposedProtocolParametersAsync(
+        public async Task<Generated.Ogmios.QueryLedgerStateProtocolParametersResponseEntity> GetProposedProtocolParametersAsync(
             OgmiosInteractionContext context,
-            Generated.Ogmios.QueryLedgerStateProposedProtocolParameters? request = null,
+            Generated.Ogmios.QueryLedgerStateProtocolParameters? request = null,
             MirrorOptions? mirrorOptions = null,
             CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            var queryRequest = request ?? Generated.Ogmios.QueryLedgerStateProposedProtocolParameters.Create(
-                jsonrpc: Generated.Ogmios.QueryLedgerStateProposedProtocolParameters.JsonrpcEntity.EnumValues.Value20,
-                method: Generated.Ogmios.QueryLedgerStateProposedProtocolParameters.MethodEntity.EnumValues.QueryLedgerStateProposedProtocolParameters,
+            var queryRequest = request ?? Generated.Ogmios.QueryLedgerStateProtocolParameters.Create(
+                jsonrpc: Generated.Ogmios.QueryLedgerStateProtocolParameters.JsonrpcEntity.EnumValues.Value20,
+                method: Generated.Ogmios.QueryLedgerStateProtocolParameters.MethodEntity.EnumValues.QueryLedgerStateProtocolParameters,
                 id: mirrorOptions?.Id ?? string.Empty);
 
             var message = queryRequest.AsJsonElement.ToString();
@@ -27,11 +27,11 @@ namespace Ogmios.Services.LedgerStateQueries
             var responseMessage = await _webSocketService.SendAndWaitForResponseAsync(message, context.Socket, timeoutMilliseconds: default, cancellationToken)
                 ?? throw new InvalidOperationException("The response message is null.");
 
-            Generated.Ogmios.QueryLedgerStateProposedProtocolParametersResponseEntity responseEntity;
-            try { responseEntity = ParsedValue<Generated.Ogmios.QueryLedgerStateProposedProtocolParametersResponseEntity>.Parse(responseMessage).Instance; }
-            catch (Exception ex) { throw new InvalidOperationException("Failed to parse queryLedgerStateProposedProtocolParameters response: " + responseMessage, ex); }
+            Generated.Ogmios.QueryLedgerStateProtocolParametersResponseEntity responseEntity;
+            try { responseEntity = ParsedValue<Generated.Ogmios.QueryLedgerStateProtocolParametersResponseEntity>.Parse(responseMessage).Instance; }
+            catch (Exception ex) { throw new InvalidOperationException("Failed to parse queryLedgerStateProtocolParameters response: " + responseMessage, ex); }
 
-            if (responseEntity.IsQueryLedgerStateProposedProtocolParametersResponse) return responseEntity;
+            if (responseEntity.IsQueryLedgerStateProtocolParametersResponse) return responseEntity;
             if (responseEntity.IsQueryLedgerStateAcquiredExpired)
                 throw new LedgerStateAcquiredExpiredException("The acquired ledger state has expired.", responseMessage);
             if (responseEntity.IsQueryLedgerStateEraMismatch)

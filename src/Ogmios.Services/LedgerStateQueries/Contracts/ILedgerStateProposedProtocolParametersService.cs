@@ -3,9 +3,9 @@ namespace Ogmios.Services.LedgerStateQueries.Contracts
 {
     public interface ILedgerStateProposedProtocolParametersService
     {
-        Task<OgmiosSchema.QueryLedgerStateProposedProtocolParametersResponseEntity> GetProposedProtocolParametersAsync(
+        Task<OgmiosSchema.QueryLedgerStateProtocolParametersResponseEntity> GetProposedProtocolParametersAsync(
             OgmiosInteractionContext context,
-            OgmiosSchema.QueryLedgerStateProposedProtocolParameters? request = null,
+            OgmiosSchema.QueryLedgerStateProtocolParameters? request = null,
             MirrorOptions? mirrorOptions = null,
             CancellationToken cancellationToken = default);
     }
