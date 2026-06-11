@@ -6,12 +6,30 @@ namespace Ogmios.Services.ChainSynchronization
 {
     public class ChainSynchronizationClientService(IChainSynchronizationMessageHandlers messageHandlers, IIntersectionService intersectionService, IBlockService blockService) : IChainSynchronizationClientService
     {
-        public readonly BlockingCollection<(byte[], Domain.InteractionContext)> MessageQueue = new(boundedCapacity: 1000);
+        /// <summary>
+        /// The active session's message queue. Re-created on every <see cref="ResumeAsync"/>
+        /// so a new session never consumes messages queued by a previous session.
+        /// </summary>
+        public BlockingCollection<(byte[], Domain.InteractionContext)> MessageQueue { get; private set; } = new(boundedCapacity: 1000);
+
         private readonly IChainSynchronizationMessageHandlers _messageHandlers = messageHandlers ?? throw new ArgumentNullException(nameof(messageHandlers));
         private readonly IIntersectionService _intersectionService = intersectionService ?? throw new ArgumentNullException(nameof(intersectionService));
         private readonly IBlockService _blockService = blockService ?? throw new ArgumentNullException(nameof(blockService));
 
+        private readonly object _sessionLock = new();
+        private CancellationTokenSource? _sessionCts;
+        private List<Task> _sessionTasks = new();
+        private List<Domain.InteractionContext> _sessionContexts = new();
+
         public async Task ResumeListeningAsync(Domain.InteractionContext interactionContext, CancellationToken cancellationToken)
+        {
+            await ResumeListeningAsync(interactionContext, MessageQueue, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task ResumeListeningAsync(
+            Domain.InteractionContext interactionContext,
+            BlockingCollection<(byte[], Domain.InteractionContext)> messageQueue,
+            CancellationToken cancellationToken)
         {
             var buffer = new byte[65536]; // 64 KB buffer to reduce fragmented reads for large Cardano blocks
             using var messageStream = new MemoryStream();
@@ -29,7 +47,7 @@ namespace Ogmios.Services.ChainSynchronization
                         if (result.EndOfMessage)
                         {
                             var messageBytes = messageStream.ToArray();
-                            MessageQueue.Add((messageBytes, interactionContext), cancellationToken);
+                            messageQueue.Add((messageBytes, interactionContext), cancellationToken);
                             messageStream.SetLength(0);
                         }
                     }
@@ -39,9 +57,15 @@ namespace Ogmios.Services.ChainSynchronization
                         break;
                     }
                 }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
                 catch (WebSocketException webSocketException)
                 {
                     Console.WriteLine($"WebSocket error: {webSocketException.Message}");
+
+                    if (interactionContext.Socket.State != WebSocketState.Open) break;
                 }
                 catch (Exception ex)
                 {
@@ -52,9 +76,17 @@ namespace Ogmios.Services.ChainSynchronization
 
         public async Task ProcessMessagesAsync(int maxBlocksPerSecond, CancellationToken cancellationToken)
         {
+            await ProcessMessagesAsync(MessageQueue, maxBlocksPerSecond, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task ProcessMessagesAsync(
+            BlockingCollection<(byte[], Domain.InteractionContext)> messageQueue,
+            int maxBlocksPerSecond,
+            CancellationToken cancellationToken)
+        {
             try
             {
-                foreach (var item in MessageQueue.GetConsumingEnumerable(cancellationToken))
+                foreach (var item in messageQueue.GetConsumingEnumerable(cancellationToken))
                 {
                     var (messageBytes, context) = item;
 
@@ -86,16 +118,39 @@ namespace Ogmios.Services.ChainSynchronization
 
         public async Task<List<StartingPointConfiguration>> ResumeAsync(List<Domain.InteractionContext> interactionContexts, int maxBlocksPerSecond, int inFlight = 100, CancellationToken cancellationToken = default)
         {
+            // Terminate any previous session first so only one session pumps blocks.
+            await ShutdownSessionAsync().ConfigureAwait(false);
+
+            CancellationTokenSource sessionCts;
+            BlockingCollection<(byte[], Domain.InteractionContext)> sessionQueue;
+            lock (_sessionLock)
+            {
+                sessionCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                sessionQueue = new BlockingCollection<(byte[], Domain.InteractionContext)>(boundedCapacity: 1000);
+                _sessionCts = sessionCts;
+                MessageQueue = sessionQueue;
+                _sessionContexts = interactionContexts.ToList();
+            }
+            var sessionToken = sessionCts.Token;
+
             foreach (var context in interactionContexts)
             {
                 await CreatePointFromCurrentTipAsync(context, context.StartingPoint).ConfigureAwait(false);
             }
 
-            _ = Task.Run(() => ProcessMessagesAsync(maxBlocksPerSecond, cancellationToken), cancellationToken);
+            var tasks = new List<Task>
+            {
+                Task.Run(() => ProcessMessagesAsync(sessionQueue, maxBlocksPerSecond, sessionToken), CancellationToken.None),
+            };
 
             foreach (var context in interactionContexts)
             {
-                _ = Task.Run(() => ResumeListeningAsync(context, cancellationToken), cancellationToken);
+                tasks.Add(Task.Run(() => ResumeListeningAsync(context, sessionQueue, sessionToken), CancellationToken.None));
+            }
+
+            lock (_sessionLock)
+            {
+                _sessionTasks = tasks;
             }
 
             foreach (var context in interactionContexts)
@@ -107,6 +162,43 @@ namespace Ogmios.Services.ChainSynchronization
             }
 
             return interactionContexts.Select(x => x.StartingPoint).ToList();
+        }
+
+        public async Task ShutdownSessionAsync()
+        {
+            CancellationTokenSource? cts;
+            List<Task> tasks;
+            List<Domain.InteractionContext> contexts;
+
+            lock (_sessionLock)
+            {
+                cts = _sessionCts;
+                tasks = _sessionTasks;
+                contexts = _sessionContexts;
+                _sessionCts = null;
+                _sessionTasks = new List<Task>();
+                _sessionContexts = new List<Domain.InteractionContext>();
+            }
+
+            if (cts is null && tasks.Count == 0) return;
+
+            try { cts?.Cancel(); }
+            catch (ObjectDisposedException) { }
+
+            // Close sockets so a listener blocked inside ReceiveAsync unblocks.
+            foreach (var context in contexts)
+            {
+                try { await ShutdownAsync(context).ConfigureAwait(false); }
+                catch { /* socket already dead */ }
+            }
+
+            if (tasks.Count > 0)
+            {
+                try { await Task.WhenAll(tasks).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false); }
+                catch { /* best-effort */ }
+            }
+
+            cts?.Dispose();
         }
 
         private async Task RequestNextBlockAsync(Domain.InteractionContext interactionContext)
