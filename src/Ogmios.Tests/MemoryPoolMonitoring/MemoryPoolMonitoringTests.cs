@@ -1,4 +1,5 @@
 using System.Net.WebSockets;
+using System.Text;
 using Corvus.Json;
 using Moq;
 using Ogmios.Domain;
@@ -45,7 +46,8 @@ public class MempoolMonitoringClientTests
         var interactionContextInvalidPort = CreateMockInteractionContext(port: 1111);
 
         var mockWebSocketService = new Mock<IWebSocketService>();
-        mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(It.IsAny<string>(), It.IsAny<IClientWebSocket>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ThrowsAsync(new WebSocketException("Simulated connection failure"));
+        mockWebSocketService.Setup(x => x.SendAndWaitForResponseBytesAsync(It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<IClientWebSocket>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ThrowsAsync(new WebSocketException("Simulated connection failure"));
+        mockWebSocketService.Setup(x => x.SendAndWaitForResponseBytesAsync(It.IsAny<string>(), It.IsAny<IClientWebSocket>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ThrowsAsync(new WebSocketException("Simulated connection failure"));
 
         var service = new MemoryPoolMonitoringService(mockWebSocketService.Object);
 
@@ -67,12 +69,7 @@ public class MempoolMonitoringClientTests
         var mockWebSocketService = new Mock<IWebSocketService>();
 
         var validResponseJson = Generated.Ogmios.AcquireMempoolResponse.Create(jsonrpc: Generated.Ogmios.AcquireMempoolResponse.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.AcquireMempoolResponse.MethodEntity.EnumValues.AcquireMempool, result: Generated.Ogmios.AcquireMempoolResponse.RequiredAcquiredAndSlot.Create(acquired: Generated.Ogmios.AcquireMempoolResponse.RequiredAcquiredAndSlot.AcquiredEntity.EnumValues.Mempool, slot: Generated.Slot.ParseValue(slot)));
-        mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(
-                It.IsAny<string>(),
-                It.IsAny<IClientWebSocket>(),
-                It.IsAny<int>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(validResponseJson.AsJsonElement.ToString());
+        SetupBytesResponse(mockWebSocketService, validResponseJson.AsJsonElement.ToString());
 
         var service = new MemoryPoolMonitoringService(mockWebSocketService.Object);
 
@@ -93,12 +90,7 @@ public class MempoolMonitoringClientTests
         var service = new MemoryPoolMonitoringService(mockWebSocketService.Object);
 
         var hasTransactionResponseJson = Generated.Ogmios.HasTransactionResponseEntity.HasTransactionResponse.Create(jsonrpc: Generated.Ogmios.HasTransactionResponseEntity.HasTransactionResponse.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.HasTransactionResponseEntity.HasTransactionResponse.MethodEntity.EnumValues.HasTransaction, result: false);
-        mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(
-                     It.IsAny<string>(),
-                     It.IsAny<IClientWebSocket>(),
-                     It.IsAny<int>(),
-                     It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(hasTransactionResponseJson.AsJsonElement.ToString());
+        SetupBytesResponse(mockWebSocketService, hasTransactionResponseJson.AsJsonElement.ToString());
 
         // Act
         var exists = await service.HasTransactionAsync(interactionContext, "4f539156bfbefc070a3b61cad3d1cedab3050e2b2a62f0ffe16a43eb0edc1ce8", CancellationToken.None);
@@ -118,12 +110,7 @@ public class MempoolMonitoringClientTests
 
 
         var hasTransactionResponseJson = Generated.Ogmios.MustAcquireMempoolFirst.Create(error: Generated.Ogmios.MustAcquireMempoolFirst.MustAcquireAMempoolSnapshotPriorToPerformingAnyQuery.Create(code: 4000, message: "You must acquire a mempool snapshot prior to accessing it."), jsonrpc: Generated.Ogmios.MustAcquireMempoolFirst.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.MustAcquireMempoolFirst.MethodEntity.EnumValues.HasTransaction);
-        mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(
-                     It.IsAny<string>(),
-                     It.IsAny<IClientWebSocket>(),
-                     It.IsAny<int>(),
-                     It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(hasTransactionResponseJson.AsJsonElement.ToString());
+        SetupBytesResponse(mockWebSocketService, hasTransactionResponseJson.AsJsonElement.ToString());
 
         // Act & Assert
         await Assert.ThrowsAsync<MustAcquireMempoolFirstException>(() => service.HasTransactionAsync(interactionContext, "4f539156bfbefc070a3b61cad3d1cedab3050e2b2a62f0ffe16a43eb0edc1ce8", CancellationToken.None));
@@ -142,12 +129,7 @@ public class MempoolMonitoringClientTests
             method: Generated.Ogmios.NextTransactionResponseEntity.NextTransactionResponse.MethodEntity.EnumValues.NextTransaction,
             result: Generated.Ogmios.NextTransactionResponseEntity.NextTransactionResponse.RequiredTransaction.Null
         );
-        mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(
-                It.IsAny<string>(),
-                It.IsAny<IClientWebSocket>(),
-                It.IsAny<int>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(nextTransactionResponseJson.AsJsonElement.ToString());
+        SetupBytesResponse(mockWebSocketService, nextTransactionResponseJson.AsJsonElement.ToString());
 
         var service = new MemoryPoolMonitoringService(mockWebSocketService.Object);
 
@@ -175,12 +157,7 @@ public class MempoolMonitoringClientTests
             jsonrpc: Generated.Ogmios.MustAcquireMempoolFirst.JsonrpcEntity.EnumValues.Value20,
             method: Generated.Ogmios.MustAcquireMempoolFirst.MethodEntity.EnumValues.NextTransaction
         );
-        mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(
-                It.IsAny<string>(),
-                It.IsAny<IClientWebSocket>(),
-                It.IsAny<int>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(nextTransactionErrorResponseJson.AsJsonElement.ToString());
+        SetupBytesResponse(mockWebSocketService, nextTransactionErrorResponseJson.AsJsonElement.ToString());
 
         var service = new MemoryPoolMonitoringService(mockWebSocketService.Object);
 
@@ -203,12 +180,7 @@ public class MempoolMonitoringClientTests
             result: Generated.Ogmios.MempoolSizeAndCapacity.Create(currentSize: Generated.NumberOfBytes.Create(0), maxCapacity: Generated.NumberOfBytes.Create(1000000), transactions: Generated.Ogmios.MempoolSizeAndCapacity.RequiredCountEntity.Create(Generated.UInt32.ParseValue("5")))
         );
 
-        mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(
-                It.IsAny<string>(),
-                It.IsAny<IClientWebSocket>(),
-                It.IsAny<int>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mempoolSizeResponseJson.AsJsonElement.ToString());
+        SetupBytesResponse(mockWebSocketService, mempoolSizeResponseJson.AsJsonElement.ToString());
 
         var service = new MemoryPoolMonitoringService(mockWebSocketService.Object);
 
@@ -237,18 +209,32 @@ public class MempoolMonitoringClientTests
             jsonrpc: Generated.Ogmios.MustAcquireMempoolFirst.JsonrpcEntity.EnumValues.Value20,
             method: Generated.Ogmios.MustAcquireMempoolFirst.MethodEntity.EnumValues.SizeOfMempool
         );
-        mockWebSocketService.Setup(x => x.SendAndWaitForResponseAsync(
-                It.IsAny<string>(),
-                It.IsAny<IClientWebSocket>(),
-                It.IsAny<int>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mempoolSizeErrorResponseJson.AsJsonElement.ToString());
+        SetupBytesResponse(mockWebSocketService, mempoolSizeErrorResponseJson.AsJsonElement.ToString());
 
         var service = new MemoryPoolMonitoringService(mockWebSocketService.Object);
 
         // Act & Assert
         await Assert.ThrowsAsync<MustAcquireMempoolFirstException>(() =>
             service.SizeOfMempoolAsync(interactionContext, CancellationToken.None));
+    }
+
+    private static void SetupBytesResponse(Mock<IWebSocketService> mockWebSocketService, string responseJson)
+    {
+        var responseBytes = Encoding.UTF8.GetBytes(responseJson);
+
+        mockWebSocketService.Setup(x => x.SendAndWaitForResponseBytesAsync(
+                It.IsAny<ReadOnlyMemory<byte>>(),
+                It.IsAny<IClientWebSocket>(),
+                It.IsAny<int>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(responseBytes);
+
+        mockWebSocketService.Setup(x => x.SendAndWaitForResponseBytesAsync(
+                It.IsAny<string>(),
+                It.IsAny<IClientWebSocket>(),
+                It.IsAny<int>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(responseBytes);
     }
 
     private static InteractionContext CreateMockInteractionContext(string host = "localhost", int port = 8080)
