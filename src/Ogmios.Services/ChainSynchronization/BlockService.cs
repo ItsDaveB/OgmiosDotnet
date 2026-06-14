@@ -1,15 +1,25 @@
+using System.Text;
 using Corvus.Json;
 using Ogmios.Domain;
-
 
 namespace Ogmios.Services.ChainSynchronization;
 
 public class BlockService(IWebSocketService webSocketService) : IBlockService
 {
+    private static readonly byte[] NextBlockPrefix = Encoding.UTF8.GetBytes("{\"jsonrpc\":\"2.0\",\"method\":\"nextBlock\",\"id\":\"");
+    private static readonly byte[] NextBlockSuffix = Encoding.UTF8.GetBytes("\"}");
+
     public Task GetNextBlockAsync(Domain.InteractionContext context, MirrorOptions? options = null)
     {
-        var nextBlockRequest = Generated.Ogmios.NextBlock.Create(jsonrpc: Generated.Ogmios.NextBlock.JsonrpcEntity.EnumValues.Value20, method: Generated.Ogmios.NextBlock.MethodEntity.EnumValues.NextBlock, id: options?.Id ?? string.Empty);
-        return webSocketService.SendMessageAsync(nextBlockRequest.AsJsonElement.ToString(), context.Socket);
+        var requestId = options?.Id ?? string.Empty;
+        var idBytes = Encoding.UTF8.GetBytes(requestId);
+        var message = new byte[NextBlockPrefix.Length + idBytes.Length + NextBlockSuffix.Length];
+
+        NextBlockPrefix.CopyTo(message, 0);
+        idBytes.CopyTo(message, NextBlockPrefix.Length);
+        NextBlockSuffix.CopyTo(message, NextBlockPrefix.Length + idBytes.Length);
+
+        return webSocketService.SendMessageAsync(message, context.Socket);
     }
 
     public async Task HandleNextBlockAsync(string response, IChainSynchronizationMessageHandlers messageHandlers)

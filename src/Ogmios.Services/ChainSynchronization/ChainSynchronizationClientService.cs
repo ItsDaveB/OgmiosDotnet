@@ -1,3 +1,5 @@
+using System.Buffers;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Collections.Concurrent;
 using Ogmios.Domain;
@@ -10,7 +12,7 @@ namespace Ogmios.Services.ChainSynchronization
         /// The active session's message queue. Re-created on every <see cref="ResumeAsync"/>
         /// so a new session never consumes messages queued by a previous session.
         /// </summary>
-        public BlockingCollection<(byte[], Domain.InteractionContext)> MessageQueue { get; private set; } = new(boundedCapacity: 1000);
+        public BlockingCollection<PooledWebSocketMessage> MessageQueue { get; private set; } = new(boundedCapacity: 1000);
 
         private readonly IChainSynchronizationMessageHandlers _messageHandlers = messageHandlers ?? throw new ArgumentNullException(nameof(messageHandlers));
         private readonly IIntersectionService _intersectionService = intersectionService ?? throw new ArgumentNullException(nameof(intersectionService));
@@ -28,49 +30,61 @@ namespace Ogmios.Services.ChainSynchronization
 
         private async Task ResumeListeningAsync(
             Domain.InteractionContext interactionContext,
-            BlockingCollection<(byte[], Domain.InteractionContext)> messageQueue,
+            BlockingCollection<PooledWebSocketMessage> messageQueue,
             CancellationToken cancellationToken)
         {
-            var buffer = new byte[65536]; // 64 KB buffer to reduce fragmented reads for large Cardano blocks
+            var buffer = ArrayPool<byte>.Shared.Rent(65536);
             using var messageStream = new MemoryStream();
 
-            while (!cancellationToken.IsCancellationRequested && interactionContext.Socket.State == WebSocketState.Open)
+            try
             {
-                try
+                while (!cancellationToken.IsCancellationRequested && interactionContext.Socket.State == WebSocketState.Open)
                 {
-                    var result = await interactionContext.Socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
-
-                    if (result.MessageType == WebSocketMessageType.Text)
+                    try
                     {
-                        messageStream.Write(buffer, 0, result.Count);
+                        var receiveBuffer = new ArraySegment<byte>(buffer, 0, Math.Min(buffer.Length, 65536));
+                        var result = await interactionContext.Socket.ReceiveAsync(receiveBuffer, cancellationToken);
 
-                        if (result.EndOfMessage)
+                        if (result.MessageType == WebSocketMessageType.Text)
                         {
-                            var messageBytes = messageStream.ToArray();
-                            messageQueue.Add((messageBytes, interactionContext), cancellationToken);
-                            messageStream.SetLength(0);
+                            messageStream.Write(buffer, 0, result.Count);
+
+                            if (result.EndOfMessage)
+                            {
+                                var messageLength = (int)messageStream.Length;
+                                var messageBuffer = ArrayPool<byte>.Shared.Rent(messageLength);
+                                _ = messageStream.TryGetBuffer(out var streamBuffer);
+                                Buffer.BlockCopy(streamBuffer.Array!, streamBuffer.Offset, messageBuffer, 0, messageLength);
+
+                                messageQueue.Add(new PooledWebSocketMessage(messageBuffer, messageLength, interactionContext), cancellationToken);
+                                messageStream.SetLength(0);
+                            }
+                        }
+                        else if (result.MessageType == WebSocketMessageType.Close)
+                        {
+                            await ShutdownAsync(interactionContext).ConfigureAwait(false);
+                            break;
                         }
                     }
-                    else if (result.MessageType == WebSocketMessageType.Close)
+                    catch (OperationCanceledException)
                     {
-                        await ShutdownAsync(interactionContext).ConfigureAwait(false);
                         break;
                     }
-                }
-                catch (OperationCanceledException)
-                {
-                    break;
-                }
-                catch (WebSocketException webSocketException)
-                {
-                    Console.WriteLine($"WebSocket error: {webSocketException.Message}");
+                    catch (WebSocketException webSocketException)
+                    {
+                        Console.WriteLine($"WebSocket error: {webSocketException.Message}");
 
-                    if (interactionContext.Socket.State != WebSocketState.Open) break;
+                        if (interactionContext.Socket.State != WebSocketState.Open) break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Unexpected error: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Unexpected error: {ex.Message}");
-                }
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
             }
         }
 
@@ -80,18 +94,39 @@ namespace Ogmios.Services.ChainSynchronization
         }
 
         private async Task ProcessMessagesAsync(
-            BlockingCollection<(byte[], Domain.InteractionContext)> messageQueue,
+            BlockingCollection<PooledWebSocketMessage> messageQueue,
             int maxBlocksPerSecond,
             CancellationToken cancellationToken)
         {
+            var minIntervalBetweenRequests = maxBlocksPerSecond > 0
+                ? TimeSpan.FromSeconds(1.0 / maxBlocksPerSecond)
+                : TimeSpan.Zero;
+            var requestStopwatch = Stopwatch.StartNew();
+
             try
             {
-                foreach (var item in messageQueue.GetConsumingEnumerable(cancellationToken))
+                foreach (var message in messageQueue.GetConsumingEnumerable(cancellationToken))
                 {
-                    var (messageBytes, context) = item;
+                    try
+                    {
+                        await ProcessBlockMessageAsync(message.Memory).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        message.Return();
+                    }
 
-                    await ProcessBlockMessageAsync(messageBytes);
-                    await RequestNextBlockAsync(context);
+                    if (minIntervalBetweenRequests > TimeSpan.Zero)
+                    {
+                        var elapsed = requestStopwatch.Elapsed;
+                        if (elapsed < minIntervalBetweenRequests)
+                        {
+                            await Task.Delay(minIntervalBetweenRequests - elapsed, cancellationToken).ConfigureAwait(false);
+                        }
+                    }
+
+                    await RequestNextBlockAsync(message.Context).ConfigureAwait(false);
+                    requestStopwatch.Restart();
                 }
             }
             catch (OperationCanceledException)
@@ -104,11 +139,11 @@ namespace Ogmios.Services.ChainSynchronization
             }
         }
 
-        private async Task ProcessBlockMessageAsync(byte[] messageBytes)
+        private async Task ProcessBlockMessageAsync(ReadOnlyMemory<byte> messageBytes)
         {
             try
             {
-                await _blockService.HandleNextBlockAsync(new ReadOnlyMemory<byte>(messageBytes), _messageHandlers);
+                await _blockService.HandleNextBlockAsync(messageBytes, _messageHandlers).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -118,15 +153,14 @@ namespace Ogmios.Services.ChainSynchronization
 
         public async Task<List<StartingPointConfiguration>> ResumeAsync(List<Domain.InteractionContext> interactionContexts, int maxBlocksPerSecond, int inFlight = 100, CancellationToken cancellationToken = default)
         {
-            // Terminate any previous session first so only one session pumps blocks.
             await ShutdownSessionAsync().ConfigureAwait(false);
 
             CancellationTokenSource sessionCts;
-            BlockingCollection<(byte[], Domain.InteractionContext)> sessionQueue;
+            BlockingCollection<PooledWebSocketMessage> sessionQueue;
             lock (_sessionLock)
             {
                 sessionCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                sessionQueue = new BlockingCollection<(byte[], Domain.InteractionContext)>(boundedCapacity: 1000);
+                sessionQueue = new BlockingCollection<PooledWebSocketMessage>(boundedCapacity: 1000);
                 _sessionCts = sessionCts;
                 MessageQueue = sessionQueue;
                 _sessionContexts = interactionContexts.ToList();
@@ -157,7 +191,7 @@ namespace Ogmios.Services.ChainSynchronization
             {
                 for (int i = 0; i < inFlight; i++)
                 {
-                    await RequestNextBlockAsync(context);
+                    await RequestNextBlockAsync(context).ConfigureAwait(false);
                 }
             }
 
@@ -185,7 +219,6 @@ namespace Ogmios.Services.ChainSynchronization
             try { cts?.Cancel(); }
             catch (ObjectDisposedException) { }
 
-            // Close sockets so a listener blocked inside ReceiveAsync unblocks.
             foreach (var context in contexts)
             {
                 try { await ShutdownAsync(context).ConfigureAwait(false); }
@@ -206,7 +239,7 @@ namespace Ogmios.Services.ChainSynchronization
             try
             {
                 var requestId = Guid.NewGuid();
-                await _blockService.GetNextBlockAsync(interactionContext, new MirrorOptions { Id = requestId.ToString() });
+                await _blockService.GetNextBlockAsync(interactionContext, new MirrorOptions { Id = requestId.ToString() }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

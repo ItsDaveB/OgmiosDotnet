@@ -74,9 +74,10 @@ namespace Ogmios.Tests.ChainSynchronization
 
             // Assert
             Assert.Single(_service.MessageQueue);
-            var (queuedBytes, context) = _service.MessageQueue.First();
-            Assert.Equal(message, Encoding.UTF8.GetString(queuedBytes));
-            Assert.Equal(interactionContext, context);
+            var queuedMessage = _service.MessageQueue.First();
+            Assert.Equal(message, Encoding.UTF8.GetString(queuedMessage.Memory.Span));
+            Assert.Equal(interactionContext, queuedMessage.Context);
+            queuedMessage.Return();
 
             mockSocket.Verify(
                 x => x.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", It.IsAny<CancellationToken>()),

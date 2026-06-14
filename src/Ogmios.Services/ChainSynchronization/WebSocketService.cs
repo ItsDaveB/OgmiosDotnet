@@ -1,4 +1,5 @@
 using System.Net.WebSockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Ogmios.Domain;
@@ -24,7 +25,6 @@ public class WebSocketService : IWebSocketService
         var hostname = addressWebSocket.Host;
         var socket = ClientWebSocketWrapper.Create(hostname, connectionConfig.SslValidation);
 
-        // Log if SSL bypass is being used
         if (ClientWebSocketWrapper.HostnameRequiresSslBypass(hostname) &&
             connectionConfig.SslValidation != SslCertificateValidation.Strict)
         {
@@ -36,57 +36,85 @@ public class WebSocketService : IWebSocketService
         socket.Options.KeepAliveInterval = TimeSpan.FromSeconds(connectionConfig.KeepAliveInterval);
         socket.Options.SetBuffer(connectionConfig.MaxPayload, connectionConfig.MaxPayload);
 
-        try
-        {
-            await socket.ConnectAsync(addressWebSocket, cancellationToken);
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        await socket.ConnectAsync(addressWebSocket, cancellationToken);
 
         return socket;
     }
 
-    public async Task SendMessageAsync(string message, IClientWebSocket clientWebSocket, CancellationToken cancellationToken = default)
+    public Task SendMessageAsync(string message, IClientWebSocket clientWebSocket, CancellationToken cancellationToken = default)
     {
         var buffer = Encoding.UTF8.GetBytes(message);
-        var segment = new ArraySegment<byte>(buffer);
-        await clientWebSocket.SendAsync(segment, WebSocketMessageType.Text, true, cancellationToken);
+        return SendMessageAsync(buffer, clientWebSocket, cancellationToken);
+    }
+
+    public Task SendMessageAsync(ReadOnlyMemory<byte> message, IClientWebSocket clientWebSocket, CancellationToken cancellationToken = default)
+    {
+        ArraySegment<byte> segment;
+        if (MemoryMarshal.TryGetArray(message, out var arraySegment))
+        {
+            segment = new ArraySegment<byte>(arraySegment.Array!, arraySegment.Offset, arraySegment.Count);
+        }
+        else
+        {
+            segment = new ArraySegment<byte>(message.ToArray());
+        }
+
+        return clientWebSocket.SendAsync(segment, WebSocketMessageType.Text, true, cancellationToken);
     }
 
     public async Task<string> ReceiveMessageAsync(IClientWebSocket clientWebSocket, CancellationToken cancellationToken = default)
     {
-        using var memoryStream = new MemoryStream();
-        var buffer = new byte[BufferSize];
-
-        while (true)
-        {
-            var result = await clientWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
-
-            if (result.MessageType == WebSocketMessageType.Close)
-            {
-                await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", cancellationToken);
-                throw new WebSocketException("Connection closed by the remote host.");
-            }
-
-            memoryStream.Write(buffer, 0, result.Count);
-
-            if (result.EndOfMessage)
-            {
-                break;
-            }
-        }
-
-        return Encoding.UTF8.GetString(memoryStream.ToArray());
+        var bytes = await ReceiveMessageBytesAsync(clientWebSocket, WebSocketTimeouts.Default, cancellationToken);
+        return Encoding.UTF8.GetString(bytes);
     }
 
-    public async Task<string> SendAndWaitForResponseAsync(string message, IClientWebSocket clientWebSocket, int timeoutMilliseconds = 5000, CancellationToken cancellationToken = default)
+    public async Task<byte[]> ReceiveMessageBytesAsync(IClientWebSocket clientWebSocket, int timeoutMilliseconds = WebSocketTimeouts.Default, CancellationToken cancellationToken = default)
+    {
+        var timeoutTokenSource = CreateTimeoutTokenSource(timeoutMilliseconds, cancellationToken, out var receiveToken);
+
+        try
+        {
+            using var memoryStream = new MemoryStream();
+            var buffer = new byte[BufferSize];
+
+            while (true)
+            {
+                var result = await clientWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), receiveToken);
+
+                if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                    throw new WebSocketException("Connection closed by the remote host.");
+                }
+
+                memoryStream.Write(buffer, 0, result.Count);
+
+                if (result.EndOfMessage)
+                {
+                    break;
+                }
+            }
+
+            return memoryStream.ToArray();
+        }
+        finally
+        {
+            timeoutTokenSource?.Dispose();
+        }
+    }
+
+    public async Task<string> SendAndWaitForResponseAsync(string message, IClientWebSocket clientWebSocket, int timeoutMilliseconds = WebSocketTimeouts.Default, CancellationToken cancellationToken = default)
+    {
+        var bytes = await SendAndWaitForResponseBytesAsync(message, clientWebSocket, timeoutMilliseconds, cancellationToken);
+        return Encoding.UTF8.GetString(bytes);
+    }
+
+    public async Task<byte[]> SendAndWaitForResponseBytesAsync(string message, IClientWebSocket clientWebSocket, int timeoutMilliseconds = WebSocketTimeouts.Default, CancellationToken cancellationToken = default)
     {
         try
         {
             await SendMessageAsync(message, clientWebSocket, cancellationToken);
-            return await ReceiveMessageAsync(clientWebSocket, cancellationToken);
+            return await ReceiveMessageBytesAsync(clientWebSocket, timeoutMilliseconds, cancellationToken);
         }
         catch (WebSocketException)
         {
@@ -105,5 +133,24 @@ public class WebSocketService : IWebSocketService
     public Task CloseAsync(IClientWebSocket clientWebSocket)
     {
         throw new NotImplementedException();
+    }
+
+    private static CancellationTokenSource? CreateTimeoutTokenSource(
+        int timeoutMilliseconds,
+        CancellationToken cancellationToken,
+        out CancellationToken effectiveToken)
+    {
+        var resolvedTimeout = WebSocketTimeouts.ResolveTimeoutMilliseconds(timeoutMilliseconds);
+
+        if (resolvedTimeout == WebSocketTimeouts.Infinite)
+        {
+            effectiveToken = cancellationToken;
+            return null;
+        }
+
+        var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        linked.CancelAfter(TimeSpan.FromMilliseconds(resolvedTimeout));
+        effectiveToken = linked.Token;
+        return linked;
     }
 }
