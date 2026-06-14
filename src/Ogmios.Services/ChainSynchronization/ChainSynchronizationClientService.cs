@@ -179,14 +179,11 @@ namespace Ogmios.Services.ChainSynchronization
 
                     try
                     {
-                        await _blockService.EnqueueBlockHandlersAsync(message.Memory, handlerWriter, cancellationToken).ConfigureAwait(false);
+                        await _blockService.EnqueueBlockHandlersAsync(message, handlerWriter, cancellationToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
                         _logger?.LogError(ex, "Error enqueueing block handler work.");
-                    }
-                    finally
-                    {
                         message.Return();
                     }
                 }
@@ -222,6 +219,10 @@ namespace Ogmios.Services.ChainSynchronization
                     catch (Exception ex)
                     {
                         _logger?.LogError(ex, "Error executing chain sync handler.");
+                    }
+                    finally
+                    {
+                        work.ResponseBuffer.Return();
                     }
                 }
             }

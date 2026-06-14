@@ -81,11 +81,10 @@ The `OgmiosWorker` is a background service that demonstrates how **OgmiosDotnetC
 
 ### Performance notes
 
-- **Replenish `nextBlock` before handler execution** so the pipelined window stays full during slow handlers
-- **Ordered handler queues** (capacity 2000) for chain sync and mempool orchestrator — parsing/RPC continues while handlers run
-- **Pre-serialized mempool RPC bodies** on the hot path (acquire, nextTransaction, size, release)
-- **Zero-allocation `nextBlock` requests** when no custom JSON-RPC id is required
-- **Single-copy WebSocket receive** for chain sync frames
+- Handlers run on bounded ordered queues (default capacity 2000) so RPC/parsing continues during slow consumer work.
+- `nextBlock` pipeline replenishment happens before handler dispatch; static JSON-RPC body when no custom id is needed.
+- Mempool hot-path RPCs use pre-serialized UTF-8 request bodies.
+- Use separate `InteractionContext` instances per concurrent Ogmios protocol.
 
 See [Chain Synchronization](src/Ogmios.Services/ChainSynchronization/docs/README.md) and [Memory Pool Monitoring](src/Ogmios.Services/MemoryPoolMonitoring/docs/README.md) for details.
 
