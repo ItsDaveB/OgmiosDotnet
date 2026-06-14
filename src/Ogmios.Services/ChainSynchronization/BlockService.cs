@@ -51,49 +51,64 @@ public class BlockService(IWebSocketService webSocketService, ILogger<BlockServi
         await DispatchParsedBlockAsync(result, messageHandlers).ConfigureAwait(false);
     }
 
-    public async ValueTask EnqueueBlockHandlersAsync(ReadOnlyMemory<byte> utf8Response, ChannelWriter<ChainSyncBlockWork> writer, CancellationToken cancellationToken = default)
+    public async ValueTask EnqueueBlockHandlersAsync(PooledWebSocketMessage response, ChannelWriter<ChainSyncBlockWork> writer, CancellationToken cancellationToken = default)
     {
-        if (utf8Response.Length == 0)
+        if (response.Length == 0)
         {
+            response.Return();
             return;
         }
 
-        var result = ParsedValue<Generated.Ogmios.NextBlockResponse>.Parse(utf8Response);
-        await EnqueueParsedBlockAsync(result, writer, cancellationToken).ConfigureAwait(false);
+        var result = ParsedValue<Generated.Ogmios.NextBlockResponse>.Parse(response.Memory);
+        await EnqueueParsedBlockAsync(result, response, writer, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task DispatchParsedBlockAsync(ParsedValue<Generated.Ogmios.NextBlockResponse> result, IChainSynchronizationMessageHandlers messageHandlers)
     {
-        if (!TryCreateBlockWork(result, out var work))
+        if (!result.Instance.Result.TryGetProperty("direction", out var direction))
         {
             return;
         }
 
-        switch (work)
+        switch ((string)direction.AsString)
         {
-            case ChainSyncRollBackwardWork rollback:
-                await messageHandlers.RollBackwardHandler(rollback.Point, rollback.Tip).ConfigureAwait(false);
+            case "backward":
+                var rollBackward = result.Instance.Result.AsRollBackward;
+                await messageHandlers.RollBackwardHandler(rollBackward.Point, rollBackward.Tip).ConfigureAwait(false);
                 break;
-            case ChainSyncRollForwardWork forward:
-                await messageHandlers.RollForwardHandler(forward.Block, forward.BlockType, forward.Tip).ConfigureAwait(false);
+
+            case "forward":
+                var block = result.Instance.Result.AsRollForward.Block;
+                if (block.HasProperty("height") && block.TryGetProperty("height", out _) && block.HasProperty("type") && block.TryGetProperty("type", out var type))
+                {
+                    var blocktype = (string)type.AsString ?? "Unknown type";
+                    await messageHandlers.RollForwardHandler(block, blocktype, result.Instance.Result.AsRollForward.Tip).ConfigureAwait(false);
+                }
+
+                break;
+
+            default:
+                _logger?.LogDebug("Unknown or unsupported block direction: {Direction}", direction.AsString);
                 break;
         }
     }
 
     private async ValueTask EnqueueParsedBlockAsync(
         ParsedValue<Generated.Ogmios.NextBlockResponse> result,
+        PooledWebSocketMessage response,
         ChannelWriter<ChainSyncBlockWork> writer,
         CancellationToken cancellationToken)
     {
-        if (!TryCreateBlockWork(result, out var work))
+        if (!TryCreateBlockWork(result, response, out var work))
         {
+            response.Return();
             return;
         }
 
         await writer.WriteAsync(work, cancellationToken).ConfigureAwait(false);
     }
 
-    private bool TryCreateBlockWork(ParsedValue<Generated.Ogmios.NextBlockResponse> result, out ChainSyncBlockWork work)
+    private bool TryCreateBlockWork(ParsedValue<Generated.Ogmios.NextBlockResponse> result, PooledWebSocketMessage response, out ChainSyncBlockWork work)
     {
         work = null!;
 
@@ -106,7 +121,7 @@ public class BlockService(IWebSocketService webSocketService, ILogger<BlockServi
         {
             case "backward":
                 var rollBackward = result.Instance.Result.AsRollBackward;
-                work = new ChainSyncRollBackwardWork(rollBackward.Point, rollBackward.Tip);
+                work = new ChainSyncRollBackwardWork(response, rollBackward.Point, rollBackward.Tip);
                 return true;
 
             case "forward":
@@ -114,7 +129,7 @@ public class BlockService(IWebSocketService webSocketService, ILogger<BlockServi
                 if (block.HasProperty("height") && block.TryGetProperty("height", out _) && block.HasProperty("type") && block.TryGetProperty("type", out var type))
                 {
                     var blocktype = (string)type.AsString ?? "Unknown type";
-                    work = new ChainSyncRollForwardWork(block, blocktype, result.Instance.Result.AsRollForward.Tip);
+                    work = new ChainSyncRollForwardWork(response, block, blocktype, result.Instance.Result.AsRollForward.Tip);
                     return true;
                 }
 

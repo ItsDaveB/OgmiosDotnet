@@ -10,5 +10,5 @@ public interface IBlockService
 
     Task HandleNextBlockAsync(ReadOnlyMemory<byte> utf8Response, IChainSynchronizationMessageHandlers messageHandlers);
 
-    ValueTask EnqueueBlockHandlersAsync(ReadOnlyMemory<byte> utf8Response, System.Threading.Channels.ChannelWriter<ChainSyncBlockWork> writer, CancellationToken cancellationToken = default);
+    ValueTask EnqueueBlockHandlersAsync(PooledWebSocketMessage response, System.Threading.Channels.ChannelWriter<ChainSyncBlockWork> writer, CancellationToken cancellationToken = default);
 }

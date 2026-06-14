@@ -182,7 +182,10 @@ namespace Ogmios.Tests.ChainSynchronization
 
             // Assert
             _mockBlockService.Verify(
-                x => x.EnqueueBlockHandlersAsync(It.Is<ReadOnlyMemory<byte>>(b => Encoding.UTF8.GetString(b.ToArray()) == message), It.IsAny<System.Threading.Channels.ChannelWriter<ChainSyncBlockWork>>(), It.IsAny<CancellationToken>()),
+                x => x.EnqueueBlockHandlersAsync(
+                    It.Is<PooledWebSocketMessage>(m => Encoding.UTF8.GetString(m.Memory.ToArray()) == message),
+                    It.IsAny<System.Threading.Channels.ChannelWriter<ChainSyncBlockWork>>(),
+                    It.IsAny<CancellationToken>()),
                 Times.Once,
                 "Expected EnqueueBlockHandlersAsync to be called once with the correct message."
             );
@@ -225,10 +228,10 @@ namespace Ogmios.Tests.ChainSynchronization
                 });
 
             // Setup the message handlers to log the order of message processing
-            _mockBlockService.Setup(x => x.EnqueueBlockHandlersAsync(It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<ChannelWriter<ChainSyncBlockWork>>(), It.IsAny<CancellationToken>()))
-                .Callback<ReadOnlyMemory<byte>, ChannelWriter<ChainSyncBlockWork>, CancellationToken>((bytes, _, _) =>
+            _mockBlockService.Setup(x => x.EnqueueBlockHandlersAsync(It.IsAny<PooledWebSocketMessage>(), It.IsAny<ChannelWriter<ChainSyncBlockWork>>(), It.IsAny<CancellationToken>()))
+                .Callback<PooledWebSocketMessage, ChannelWriter<ChainSyncBlockWork>, CancellationToken>((message, _, _) =>
                 {
-                    messageLog.Add(Encoding.UTF8.GetString(bytes.Span));
+                    messageLog.Add(Encoding.UTF8.GetString(message.Memory.Span));
                 })
                 .Returns(ValueTask.CompletedTask);
 
