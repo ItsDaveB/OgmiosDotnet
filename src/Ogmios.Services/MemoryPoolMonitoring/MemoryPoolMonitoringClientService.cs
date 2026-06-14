@@ -1,14 +1,19 @@
 using System.Collections.Concurrent;
+using System.Threading.Channels;
 using Corvus.Json;
 using Generated;
+using Microsoft.Extensions.Logging;
 using Ogmios.Domain;
 
 namespace Ogmios.Services.MemoryPoolMonitoring;
 
-public class MemoryPoolMonitoringClientService(IMemoryPoolMonitoringService memoryPoolMonitoringService) : IMemoryPoolMonitoringClientService
+public class MemoryPoolMonitoringClientService(
+    IMemoryPoolMonitoringService memoryPoolMonitoringService,
+    ILogger<MemoryPoolMonitoringClientService>? logger = null) : IMemoryPoolMonitoringClientService
 {
     private readonly IMemoryPoolMonitoringService _memoryPoolMonitoringService =
         memoryPoolMonitoringService ?? throw new ArgumentNullException(nameof(memoryPoolMonitoringService));
+    private readonly ILogger<MemoryPoolMonitoringClientService>? _logger = logger;
 
     public async Task RunAsync(
         Domain.InteractionContext context,
@@ -24,31 +29,50 @@ public class MemoryPoolMonitoringClientService(IMemoryPoolMonitoringService memo
             ? new ConcurrentDictionary<string, byte>(StringComparer.Ordinal)
             : null;
 
-        while (!cancellationToken.IsCancellationRequested)
+        var transactionChannel = Channel.CreateBounded<Transaction>(new BoundedChannelOptions(options.HandlerQueueCapacity)
         {
-            var acquired = await _memoryPoolMonitoringService.AcquireMempoolAsync(context, cancellationToken).ConfigureAwait(false);
-            await handlers.OnSnapshotAcquiredAsync(acquired.Slot, cancellationToken).ConfigureAwait(false);
+            FullMode = BoundedChannelFullMode.Wait,
+            SingleReader = true,
+            SingleWriter = true
+        });
 
+        var handlerTask = ProcessTransactionQueueAsync(transactionChannel.Reader, handlers, cancellationToken);
+
+        try
+        {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var next = await _memoryPoolMonitoringService.NextTransactionAsync(context, cancellationToken).ConfigureAwait(false);
-                if (next.AsTransaction.IsNullOrUndefined())
-                {
-                    break;
-                }
+                var acquired = await _memoryPoolMonitoringService.AcquireMempoolAsync(context, cancellationToken).ConfigureAwait(false);
+                await handlers.OnSnapshotAcquiredAsync(acquired.Slot, cancellationToken).ConfigureAwait(false);
 
-                var transaction = next.AsTransaction;
-                if (seenTransactionIds is not null)
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    var transactionId = (string)transaction.Id;
-                    if (!seenTransactionIds.TryAdd(transactionId, 0))
+                    var next = await _memoryPoolMonitoringService.NextTransactionAsync(context, cancellationToken).ConfigureAwait(false);
+                    if (next.AsTransaction.IsNullOrUndefined())
                     {
-                        continue;
+                        break;
                     }
-                }
 
-                await handlers.OnTransactionAsync(transaction, cancellationToken).ConfigureAwait(false);
+                    var transaction = next.AsTransaction;
+                    if (seenTransactionIds is not null)
+                    {
+                        TrimDeduplicationSetIfNeeded(seenTransactionIds, options.MaxDeduplicationEntries);
+
+                        var transactionId = (string)transaction.Id;
+                        if (!seenTransactionIds.TryAdd(transactionId, 0))
+                        {
+                            continue;
+                        }
+                    }
+
+                    await transactionChannel.Writer.WriteAsync(transaction, cancellationToken).ConfigureAwait(false);
+                }
             }
+        }
+        finally
+        {
+            transactionChannel.Writer.TryComplete();
+            await handlerTask.ConfigureAwait(false);
         }
     }
 
@@ -58,11 +82,50 @@ public class MemoryPoolMonitoringClientService(IMemoryPoolMonitoringService memo
         {
             await _memoryPoolMonitoringService.ReleaseMempoolAsync(context, cancellationToken).ConfigureAwait(false);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Best-effort release before closing the socket.
+            _logger?.LogDebug(ex, "Best-effort mempool release failed during shutdown.");
         }
 
         await _memoryPoolMonitoringService.ShutdownAsync(context, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static void TrimDeduplicationSetIfNeeded(ConcurrentDictionary<string, byte> seenTransactionIds, int maxEntries)
+    {
+        if (maxEntries <= 0 || seenTransactionIds.Count < maxEntries)
+        {
+            return;
+        }
+
+        seenTransactionIds.Clear();
+    }
+
+    private async Task ProcessTransactionQueueAsync(
+        ChannelReader<Transaction> reader,
+        IMemoryPoolMonitoringMessageHandlers handlers,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await foreach (var transaction in reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
+            {
+                try
+                {
+                    await handlers.OnTransactionAsync(transaction, cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "Error executing mempool transaction handler.");
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            _logger?.LogDebug("Mempool handler queue cancelled.");
+        }
+        catch (ChannelClosedException)
+        {
+            // Expected during shutdown.
+        }
     }
 }

@@ -81,9 +81,11 @@ The `OgmiosWorker` is a background service that demonstrates how **OgmiosDotnetC
 
 ### Performance notes
 
-- Keep `IChainSynchronizationMessageHandlers` and `IMemoryPoolMonitoringMessageHandlers` fast; enqueue heavy work to background workers.
-- Use `IMemoryPoolMonitoringClientService.RunAsync` or `MemoryPoolMonitoringExtensions.MonitorAsync` to drain full snapshots.
-- Do not share one WebSocket between chain sync and mempool monitoring.
+- **Replenish `nextBlock` before handler execution** so the pipelined window stays full during slow handlers
+- **Ordered handler queues** (capacity 2000) for chain sync and mempool orchestrator — parsing/RPC continues while handlers run
+- **Pre-serialized mempool RPC bodies** on the hot path (acquire, nextTransaction, size, release)
+- **Zero-allocation `nextBlock` requests** when no custom JSON-RPC id is required
+- **Single-copy WebSocket receive** for chain sync frames
 
 See [Chain Synchronization](src/Ogmios.Services/ChainSynchronization/docs/README.md) and [Memory Pool Monitoring](src/Ogmios.Services/MemoryPoolMonitoring/docs/README.md) for details.
 

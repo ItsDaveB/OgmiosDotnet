@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Net.WebSockets;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -74,28 +75,57 @@ public class WebSocketService : IWebSocketService
 
         try
         {
-            using var memoryStream = new MemoryStream();
-            var buffer = new byte[BufferSize];
+            byte[] rented = ArrayPool<byte>.Shared.Rent(BufferSize);
+            var length = 0;
 
-            while (true)
+            try
             {
-                var result = await clientWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), receiveToken);
+                var scratch = ArrayPool<byte>.Shared.Rent(BufferSize);
 
-                if (result.MessageType == WebSocketMessageType.Close)
+                try
                 {
-                    await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-                    throw new WebSocketException("Connection closed by the remote host.");
+                    while (true)
+                    {
+                        if (length == rented.Length)
+                        {
+                            var larger = ArrayPool<byte>.Shared.Rent(rented.Length * 2);
+                            Buffer.BlockCopy(rented, 0, larger, 0, length);
+                            ArrayPool<byte>.Shared.Return(rented);
+                            rented = larger;
+                        }
+
+                        var available = rented.Length - length;
+                        var toCopy = Math.Min(available, scratch.Length);
+                        var result = await clientWebSocket.ReceiveAsync(new ArraySegment<byte>(scratch, 0, toCopy), receiveToken).ConfigureAwait(false);
+
+                        if (result.MessageType == WebSocketMessageType.Close)
+                        {
+                            await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None).ConfigureAwait(false);
+                            throw new WebSocketException("Connection closed by the remote host.");
+                        }
+
+                        Buffer.BlockCopy(scratch, 0, rented, length, result.Count);
+                        length += result.Count;
+
+                        if (result.EndOfMessage)
+                        {
+                            break;
+                        }
+                    }
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(scratch);
                 }
 
-                memoryStream.Write(buffer, 0, result.Count);
-
-                if (result.EndOfMessage)
-                {
-                    break;
-                }
+                var exact = new byte[length];
+                Buffer.BlockCopy(rented, 0, exact, 0, length);
+                return exact;
             }
-
-            return memoryStream.ToArray();
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(rented);
+            }
         }
         finally
         {
@@ -109,17 +139,35 @@ public class WebSocketService : IWebSocketService
         return Encoding.UTF8.GetString(bytes);
     }
 
-    public async Task<byte[]> SendAndWaitForResponseBytesAsync(string message, IClientWebSocket clientWebSocket, int timeoutMilliseconds = WebSocketTimeouts.Default, CancellationToken cancellationToken = default)
+    public Task<byte[]> SendAndWaitForResponseBytesAsync(ReadOnlyMemory<byte> message, IClientWebSocket clientWebSocket, int timeoutMilliseconds = WebSocketTimeouts.Default, CancellationToken cancellationToken = default)
     {
         try
         {
-            await SendMessageAsync(message, clientWebSocket, cancellationToken);
-            return await ReceiveMessageBytesAsync(clientWebSocket, timeoutMilliseconds, cancellationToken);
+            return SendAndWaitForResponseBytesCoreAsync(message, clientWebSocket, timeoutMilliseconds, cancellationToken);
         }
         catch (WebSocketException)
         {
             throw;
         }
+    }
+
+    public async Task<byte[]> SendAndWaitForResponseBytesAsync(string message, IClientWebSocket clientWebSocket, int timeoutMilliseconds = WebSocketTimeouts.Default, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await SendMessageAsync(message, clientWebSocket, cancellationToken).ConfigureAwait(false);
+            return await ReceiveMessageBytesAsync(clientWebSocket, timeoutMilliseconds, cancellationToken).ConfigureAwait(false);
+        }
+        catch (WebSocketException)
+        {
+            throw;
+        }
+    }
+
+    private async Task<byte[]> SendAndWaitForResponseBytesCoreAsync(ReadOnlyMemory<byte> message, IClientWebSocket clientWebSocket, int timeoutMilliseconds, CancellationToken cancellationToken)
+    {
+        await SendMessageAsync(message, clientWebSocket, cancellationToken).ConfigureAwait(false);
+        return await ReceiveMessageBytesAsync(clientWebSocket, timeoutMilliseconds, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task CloseAsync(IClientWebSocket clientWebSocket, CancellationToken cancellationToken)

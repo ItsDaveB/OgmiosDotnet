@@ -46,6 +46,7 @@ public class MempoolMonitoringClientTests
         var interactionContextInvalidPort = CreateMockInteractionContext(port: 1111);
 
         var mockWebSocketService = new Mock<IWebSocketService>();
+        mockWebSocketService.Setup(x => x.SendAndWaitForResponseBytesAsync(It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<IClientWebSocket>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ThrowsAsync(new WebSocketException("Simulated connection failure"));
         mockWebSocketService.Setup(x => x.SendAndWaitForResponseBytesAsync(It.IsAny<string>(), It.IsAny<IClientWebSocket>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ThrowsAsync(new WebSocketException("Simulated connection failure"));
 
         var service = new MemoryPoolMonitoringService(mockWebSocketService.Object);
@@ -219,12 +220,21 @@ public class MempoolMonitoringClientTests
 
     private static void SetupBytesResponse(Mock<IWebSocketService> mockWebSocketService, string responseJson)
     {
+        var responseBytes = Encoding.UTF8.GetBytes(responseJson);
+
+        mockWebSocketService.Setup(x => x.SendAndWaitForResponseBytesAsync(
+                It.IsAny<ReadOnlyMemory<byte>>(),
+                It.IsAny<IClientWebSocket>(),
+                It.IsAny<int>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(responseBytes);
+
         mockWebSocketService.Setup(x => x.SendAndWaitForResponseBytesAsync(
                 It.IsAny<string>(),
                 It.IsAny<IClientWebSocket>(),
                 It.IsAny<int>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Encoding.UTF8.GetBytes(responseJson));
+            .ReturnsAsync(responseBytes);
     }
 
     private static InteractionContext CreateMockInteractionContext(string host = "localhost", int port = 8080)

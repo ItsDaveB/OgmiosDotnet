@@ -79,7 +79,7 @@ Triggered when the blockchain rolls back to a previous state (e.g., due to a for
 
 ## Customization
 
-Register `IChainSynchronizationMessageHandlers` alongside `AddOgmiosServices()`:
+Register `IChainSynchronizationMessageHandlers` alongside `AddOgmiosServices()`. Handlers run on a dedicated ordered queue (capacity 2000) so block parsing and pipelining continue while your handler executes.
 
 ```csharp
 builder.Services.AddOgmiosServices();

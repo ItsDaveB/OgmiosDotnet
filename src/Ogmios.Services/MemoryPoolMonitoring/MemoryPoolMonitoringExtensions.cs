@@ -1,3 +1,4 @@
+using System.Threading.Channels;
 using Corvus.Json;
 using Generated;
 using Ogmios.Domain;
@@ -37,29 +38,67 @@ public static class MemoryPoolMonitoringExtensions
 
     /// <summary>
     /// High-throughput monitoring loop: acquire snapshot, drain all transactions, wait for next change, repeat.
-    /// Uses only acquire + nextTransaction RPCs on the hot path.
+    /// Uses only acquire + nextTransaction RPCs on the hot path and offloads callbacks to a bounded queue.
     /// </summary>
     public static async Task MonitorAsync(
         this IMemoryPoolMonitoringService service,
         Domain.InteractionContext context,
         Func<Transaction, CancellationToken, Task> onTransaction,
         CancellationToken cancellationToken,
-        Func<Generated.Slot, CancellationToken, Task>? onSnapshotAcquired = null)
+        Func<Generated.Slot, CancellationToken, Task>? onSnapshotAcquired = null,
+        int handlerQueueCapacity = 2000)
     {
         ArgumentNullException.ThrowIfNull(service);
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(onTransaction);
 
-        while (!cancellationToken.IsCancellationRequested)
+        var transactionChannel = Channel.CreateBounded<Transaction>(new BoundedChannelOptions(handlerQueueCapacity)
         {
-            var acquired = await service.AcquireMempoolAsync(context, cancellationToken).ConfigureAwait(false);
+            FullMode = BoundedChannelFullMode.Wait,
+            SingleReader = true,
+            SingleWriter = true
+        });
 
-            if (onSnapshotAcquired is not null)
+        var handlerTask = ProcessTransactionCallbacksAsync(transactionChannel.Reader, onTransaction, cancellationToken);
+
+        try
+        {
+            while (!cancellationToken.IsCancellationRequested)
             {
-                await onSnapshotAcquired(acquired.Slot, cancellationToken).ConfigureAwait(false);
-            }
+                var acquired = await service.AcquireMempoolAsync(context, cancellationToken).ConfigureAwait(false);
 
-            await service.DrainSnapshotAsync(context, onTransaction, cancellationToken).ConfigureAwait(false);
+                if (onSnapshotAcquired is not null)
+                {
+                    await onSnapshotAcquired(acquired.Slot, cancellationToken).ConfigureAwait(false);
+                }
+
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    var next = await service.NextTransactionAsync(context, cancellationToken).ConfigureAwait(false);
+                    if (next.AsTransaction.IsNullOrUndefined())
+                    {
+                        break;
+                    }
+
+                    await transactionChannel.Writer.WriteAsync(next.AsTransaction, cancellationToken).ConfigureAwait(false);
+                }
+            }
+        }
+        finally
+        {
+            transactionChannel.Writer.TryComplete();
+            await handlerTask.ConfigureAwait(false);
+        }
+    }
+
+    private static async Task ProcessTransactionCallbacksAsync(
+        ChannelReader<Transaction> reader,
+        Func<Transaction, CancellationToken, Task> onTransaction,
+        CancellationToken cancellationToken)
+    {
+        await foreach (var transaction in reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
+        {
+            await onTransaction(transaction, cancellationToken).ConfigureAwait(false);
         }
     }
 }

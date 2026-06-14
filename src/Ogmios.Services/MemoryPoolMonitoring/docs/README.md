@@ -28,6 +28,8 @@ Implement `IMemoryPoolMonitoringMessageHandlers`:
 
 Set `DeduplicateTransactions = false` when every mempool appearance of the same transaction id must be observed.
 
+`HandlerQueueCapacity` controls backpressure when `OnTransactionAsync` is slower than snapshot draining. `MaxDeduplicationEntries` prevents unbounded deduplication memory in long sessions.
+
 ### 2. Direct RPC with extension helpers
 
 If you call `IMemoryPoolMonitoringService` directly, use `MemoryPoolMonitoringExtensions`:

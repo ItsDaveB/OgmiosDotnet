@@ -18,5 +18,7 @@ public interface IWebSocketService
 
     Task<byte[]> SendAndWaitForResponseBytesAsync(string message, IClientWebSocket clientWebSocket, int timeoutMilliseconds = WebSocketTimeouts.Default, CancellationToken cancellationToken = default);
 
+    Task<byte[]> SendAndWaitForResponseBytesAsync(ReadOnlyMemory<byte> message, IClientWebSocket clientWebSocket, int timeoutMilliseconds = WebSocketTimeouts.Default, CancellationToken cancellationToken = default);
+
     Task CloseAsync(IClientWebSocket clientWebSocket);
 }

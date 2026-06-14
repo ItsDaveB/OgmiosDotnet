@@ -1,13 +1,22 @@
+using System.Collections.Concurrent;
 using System.Buffers;
 using System.Diagnostics;
 using System.Net.WebSockets;
-using System.Collections.Concurrent;
+using System.Threading.Channels;
 using Ogmios.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace Ogmios.Services.ChainSynchronization
 {
-    public class ChainSynchronizationClientService(IChainSynchronizationMessageHandlers messageHandlers, IIntersectionService intersectionService, IBlockService blockService) : IChainSynchronizationClientService
+    public class ChainSynchronizationClientService(
+        IChainSynchronizationMessageHandlers messageHandlers,
+        IIntersectionService intersectionService,
+        IBlockService blockService,
+        ILogger<ChainSynchronizationClientService>? logger = null) : IChainSynchronizationClientService
     {
+        private const int HandlerQueueCapacity = 2000;
+        private const int ReceiveBufferSize = 65536;
+
         /// <summary>
         /// The active session's message queue. Re-created on every <see cref="ResumeAsync"/>
         /// so a new session never consumes messages queued by a previous session.
@@ -17,11 +26,13 @@ namespace Ogmios.Services.ChainSynchronization
         private readonly IChainSynchronizationMessageHandlers _messageHandlers = messageHandlers ?? throw new ArgumentNullException(nameof(messageHandlers));
         private readonly IIntersectionService _intersectionService = intersectionService ?? throw new ArgumentNullException(nameof(intersectionService));
         private readonly IBlockService _blockService = blockService ?? throw new ArgumentNullException(nameof(blockService));
+        private readonly ILogger<ChainSynchronizationClientService>? _logger = logger;
 
         private readonly object _sessionLock = new();
         private CancellationTokenSource? _sessionCts;
         private List<Task> _sessionTasks = new();
         private List<Domain.InteractionContext> _sessionContexts = new();
+        private ChannelWriter<ChainSyncBlockWork>? _handlerQueueWriter;
 
         public async Task ResumeListeningAsync(Domain.InteractionContext interactionContext, CancellationToken cancellationToken)
         {
@@ -33,8 +44,9 @@ namespace Ogmios.Services.ChainSynchronization
             BlockingCollection<PooledWebSocketMessage> messageQueue,
             CancellationToken cancellationToken)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(65536);
-            using var messageStream = new MemoryStream();
+            var receiveScratch = ArrayPool<byte>.Shared.Rent(ReceiveBufferSize);
+            byte[]? messageBuffer = null;
+            var messageLength = 0;
 
             try
             {
@@ -42,22 +54,21 @@ namespace Ogmios.Services.ChainSynchronization
                 {
                     try
                     {
-                        var receiveBuffer = new ArraySegment<byte>(buffer, 0, Math.Min(buffer.Length, 65536));
-                        var result = await interactionContext.Socket.ReceiveAsync(receiveBuffer, cancellationToken);
+                        var result = await interactionContext.Socket.ReceiveAsync(
+                            new ArraySegment<byte>(receiveScratch, 0, ReceiveBufferSize),
+                            cancellationToken).ConfigureAwait(false);
 
                         if (result.MessageType == WebSocketMessageType.Text)
                         {
-                            messageStream.Write(buffer, 0, result.Count);
+                            EnsureMessageCapacity(ref messageBuffer, ref messageLength, result.Count);
+                            Buffer.BlockCopy(receiveScratch, 0, messageBuffer!, messageLength, result.Count);
+                            messageLength += result.Count;
 
                             if (result.EndOfMessage)
                             {
-                                var messageLength = (int)messageStream.Length;
-                                var messageBuffer = ArrayPool<byte>.Shared.Rent(messageLength);
-                                _ = messageStream.TryGetBuffer(out var streamBuffer);
-                                Buffer.BlockCopy(streamBuffer.Array!, streamBuffer.Offset, messageBuffer, 0, messageLength);
-
-                                messageQueue.Add(new PooledWebSocketMessage(messageBuffer, messageLength, interactionContext), cancellationToken);
-                                messageStream.SetLength(0);
+                                messageQueue.Add(new PooledWebSocketMessage(messageBuffer!, messageLength, interactionContext), cancellationToken);
+                                messageBuffer = null;
+                                messageLength = 0;
                             }
                         }
                         else if (result.MessageType == WebSocketMessageType.Close)
@@ -70,31 +81,78 @@ namespace Ogmios.Services.ChainSynchronization
                     {
                         break;
                     }
-                    catch (WebSocketException webSocketException)
+                    catch (WebSocketException ex)
                     {
-                        Console.WriteLine($"WebSocket error: {webSocketException.Message}");
+                        _logger?.LogWarning(ex, "WebSocket error while listening for chain sync messages.");
 
                         if (interactionContext.Socket.State != WebSocketState.Open) break;
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Unexpected error: {ex.Message}");
+                        _logger?.LogError(ex, "Unexpected error while listening for chain sync messages.");
                     }
                 }
             }
             finally
             {
-                ArrayPool<byte>.Shared.Return(buffer);
+                if (messageBuffer is not null)
+                {
+                    ArrayPool<byte>.Shared.Return(messageBuffer);
+                }
+
+                ArrayPool<byte>.Shared.Return(receiveScratch);
             }
+        }
+
+        private static void EnsureMessageCapacity(ref byte[]? messageBuffer, ref int messageLength, int additionalBytes)
+        {
+            var required = messageLength + additionalBytes;
+            if (messageBuffer is not null && required <= messageBuffer.Length)
+            {
+                return;
+            }
+
+            var newCapacity = Math.Max(required, messageBuffer?.Length * 2 ?? ReceiveBufferSize);
+            var newBuffer = ArrayPool<byte>.Shared.Rent(newCapacity);
+
+            if (messageBuffer is not null)
+            {
+                if (messageLength > 0)
+                {
+                    Buffer.BlockCopy(messageBuffer, 0, newBuffer, 0, messageLength);
+                }
+
+                ArrayPool<byte>.Shared.Return(messageBuffer);
+            }
+
+            messageBuffer = newBuffer;
         }
 
         public async Task ProcessMessagesAsync(int maxBlocksPerSecond, CancellationToken cancellationToken)
         {
-            await ProcessMessagesAsync(MessageQueue, maxBlocksPerSecond, cancellationToken).ConfigureAwait(false);
+            var handlerChannel = Channel.CreateBounded<ChainSyncBlockWork>(new BoundedChannelOptions(HandlerQueueCapacity)
+            {
+                FullMode = BoundedChannelFullMode.Wait,
+                SingleReader = true,
+                SingleWriter = true
+            });
+
+            var handlerTask = ProcessHandlerQueueAsync(handlerChannel.Reader, cancellationToken);
+
+            try
+            {
+                await ProcessMessagesAsync(MessageQueue, handlerChannel.Writer, maxBlocksPerSecond, cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                handlerChannel.Writer.TryComplete();
+                await handlerTask.ConfigureAwait(false);
+            }
         }
 
         private async Task ProcessMessagesAsync(
             BlockingCollection<PooledWebSocketMessage> messageQueue,
+            ChannelWriter<ChainSyncBlockWork> handlerWriter,
             int maxBlocksPerSecond,
             CancellationToken cancellationToken)
         {
@@ -116,14 +174,16 @@ namespace Ogmios.Services.ChainSynchronization
                         }
                     }
 
-                    // Replenish the pipeline before handler work so in-flight requests stay high
-                    // even when RollForwardHandler/RollBackwardHandler is slow.
                     await RequestNextBlockAsync(message.Context).ConfigureAwait(false);
                     requestStopwatch.Restart();
 
                     try
                     {
-                        await ProcessBlockMessageAsync(message.Memory).ConfigureAwait(false);
+                        await _blockService.EnqueueBlockHandlersAsync(message.Memory, handlerWriter, cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(ex, "Error enqueueing block handler work.");
                     }
                     finally
                     {
@@ -133,23 +193,45 @@ namespace Ogmios.Services.ChainSynchronization
             }
             catch (OperationCanceledException)
             {
-                Console.WriteLine("Processing cancelled.");
+                _logger?.LogDebug("Chain sync message processing cancelled.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error processing messages: {ex.Message}.");
+                _logger?.LogError(ex, "Error processing chain sync messages.");
             }
         }
 
-        private async Task ProcessBlockMessageAsync(ReadOnlyMemory<byte> messageBytes)
+        private async Task ProcessHandlerQueueAsync(ChannelReader<ChainSyncBlockWork> reader, CancellationToken cancellationToken)
         {
             try
             {
-                await _blockService.HandleNextBlockAsync(messageBytes, _messageHandlers).ConfigureAwait(false);
+                await foreach (var work in reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    try
+                    {
+                        switch (work)
+                        {
+                            case ChainSyncRollBackwardWork rollback:
+                                await _messageHandlers.RollBackwardHandler(rollback.Point, rollback.Tip).ConfigureAwait(false);
+                                break;
+                            case ChainSyncRollForwardWork forward:
+                                await _messageHandlers.RollForwardHandler(forward.Block, forward.BlockType, forward.Tip).ConfigureAwait(false);
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(ex, "Error executing chain sync handler.");
+                    }
+                }
             }
-            catch (Exception ex)
+            catch (OperationCanceledException)
             {
-                Console.WriteLine($"Error processing block message: {ex.Message}.");
+                _logger?.LogDebug("Chain sync handler queue cancelled.");
+            }
+            catch (ChannelClosedException)
+            {
+                // Expected during shutdown.
             }
         }
 
@@ -159,14 +241,24 @@ namespace Ogmios.Services.ChainSynchronization
 
             CancellationTokenSource sessionCts;
             BlockingCollection<PooledWebSocketMessage> sessionQueue;
+            Channel<ChainSyncBlockWork> handlerChannel;
+
             lock (_sessionLock)
             {
                 sessionCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 sessionQueue = new BlockingCollection<PooledWebSocketMessage>(boundedCapacity: 1000);
+                handlerChannel = Channel.CreateBounded<ChainSyncBlockWork>(new BoundedChannelOptions(HandlerQueueCapacity)
+                {
+                    FullMode = BoundedChannelFullMode.Wait,
+                    SingleReader = true,
+                    SingleWriter = true
+                });
                 _sessionCts = sessionCts;
                 MessageQueue = sessionQueue;
                 _sessionContexts = interactionContexts.ToList();
+                _handlerQueueWriter = handlerChannel.Writer;
             }
+
             var sessionToken = sessionCts.Token;
 
             foreach (var context in interactionContexts)
@@ -176,7 +268,8 @@ namespace Ogmios.Services.ChainSynchronization
 
             var tasks = new List<Task>
             {
-                Task.Run(() => ProcessMessagesAsync(sessionQueue, maxBlocksPerSecond, sessionToken), CancellationToken.None),
+                Task.Run(() => ProcessHandlerQueueAsync(handlerChannel.Reader, sessionToken), CancellationToken.None),
+                Task.Run(() => ProcessMessagesAsync(sessionQueue, handlerChannel.Writer, maxBlocksPerSecond, sessionToken), CancellationToken.None),
             };
 
             foreach (var context in interactionContexts)
@@ -205,21 +298,26 @@ namespace Ogmios.Services.ChainSynchronization
             CancellationTokenSource? cts;
             List<Task> tasks;
             List<Domain.InteractionContext> contexts;
+            ChannelWriter<ChainSyncBlockWork>? handlerWriter;
 
             lock (_sessionLock)
             {
                 cts = _sessionCts;
                 tasks = _sessionTasks;
                 contexts = _sessionContexts;
+                handlerWriter = _handlerQueueWriter;
                 _sessionCts = null;
                 _sessionTasks = new List<Task>();
                 _sessionContexts = new List<Domain.InteractionContext>();
+                _handlerQueueWriter = null;
             }
 
             if (cts is null && tasks.Count == 0) return;
 
             try { cts?.Cancel(); }
             catch (ObjectDisposedException) { }
+
+            handlerWriter?.TryComplete();
 
             foreach (var context in contexts)
             {
@@ -236,16 +334,16 @@ namespace Ogmios.Services.ChainSynchronization
             cts?.Dispose();
         }
 
-        private async Task RequestNextBlockAsync(Domain.InteractionContext interactionContext)
+        private Task RequestNextBlockAsync(Domain.InteractionContext interactionContext)
         {
             try
             {
-                var requestId = Guid.NewGuid();
-                await _blockService.GetNextBlockAsync(interactionContext, new MirrorOptions { Id = requestId.ToString() }).ConfigureAwait(false);
+                return _blockService.GetNextBlockAsync(interactionContext);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error requesting next block: {ex.Message}.");
+                _logger?.LogError(ex, "Error requesting next block.");
+                return Task.CompletedTask;
             }
         }
 
@@ -262,9 +360,7 @@ namespace Ogmios.Services.ChainSynchronization
             ArgumentNullException.ThrowIfNull(context);
 
             var intersection = await _intersectionService.FindIntersectionAsync(context, startingPoint).ConfigureAwait(false);
-            var tip = intersection.Result.Tip.AsTip;
-
-            return tip;
+            return intersection.Result.Tip.AsTip;
         }
     }
 }
