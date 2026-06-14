@@ -2,9 +2,29 @@
 
 Chain synchronization is a stateful protocol that enables clients to efficiently synchronize with the Cardano blockchain. By maintaining a cursor to track synchronization progress, clients can follow the chain, handle reorganizations, and resume syncing after disconnections.
 
+## Performance-first integration
+
+Consumers using `AddOgmiosServices()` receive blocks through `IChainSynchronizationMessageHandlers`. Throughput is dominated by handler latency.
+
+### Keep handlers fast
+
+`RollForwardHandler` and `RollBackwardHandler` run on the chain sync consumer thread. **Return quickly** — filter in memory, enqueue to a bounded `Channel`, and process DB/network work on background workers. Slow handlers cause the bounded queue (1000 blocks) to fill and the bot to fall behind.
+
+### Pipeline stays full during slow handlers
+
+The client replenishes pipelined `nextBlock` requests **before** invoking your handler, so the default `inFlight=100` window stays saturated even when handlers do heavy work.
+
+### Rate limiting during catch-up
+
+Pass `maxBlocksPerSecond` to `ResumeAsync`. Values `<= 0` mean no limit. Positive values throttle how fast new `nextBlock` requests are sent after each processed block — useful to protect downstream systems when syncing from origin.
+
+### Dedicated WebSocket
+
+Use one `InteractionContext` per concurrent Ogmios protocol. Do not share a socket between chain sync and mempool monitoring.
+
 ## Key Operations
 
-1. **Find Intersection**: Establish a common synchronization point between the client’s local chain and the blockchain node. The client can provide potential points or start from the origin.
+1. **Find Intersection**: Establish a common synchronization point between the client's local chain and the blockchain node. The client can provide potential points or start from the origin.
 
 2. **Synchronize Blocks**:
    - **Roll Forward**: Process new blocks as they are added to the chain.
@@ -27,15 +47,16 @@ As new blocks are added to the chain:
 
 When a chain fork occurs:
 
-- The protocol reverts the client’s synchronization point to the last known common block.
+- The protocol reverts the client's synchronization point to the last known common block.
 - This guarantees alignment with the canonical chain and ensures data consistency.
 
 ## Pipelining
 
 Pipelining optimizes synchronization by allowing clients to send multiple requests simultaneously:
 
+- **Default `inFlight`**: 100 concurrent `nextBlock` requests primed at session start, replenished after each dequeued response.
 - **Advantages**: Reduced latency and improved bandwidth utilization.
-- **Dynamic Adjustment**: Clients can adjust the number of pipelined requests to balance resource usage and performance.
+- **Dynamic Adjustment**: Pass a lower `inFlight` if memory is constrained; raise it for faster catch-up on high-bandwidth links.
 
 ## Points of Interest
 
@@ -54,46 +75,50 @@ Triggered when the blockchain progresses to new blocks. Clients process the new 
 
 ### **Roll Backward Events**
 
-Triggered when the blockchain rolls back to a previous state (e.g., due to a fork). Clients revert their synchronization point accordingly.
+Triggered when the blockchain rolls back to a previous state (e.g., due to a fork). Clients revert their synchronization point accordingly. Process rollbacks on the same ordered pipeline as roll-forwards (or handle synchronously in the handler before returning).
 
 ## Customization
 
-The `ChainSynchronizationMessageHandlers` class provides customizable handlers for blockchain events:
+Register `IChainSynchronizationMessageHandlers` alongside `AddOgmiosServices()`:
 
-- **Roll Forward**: Extend to include actions such as persisting block data or triggering application-specific workflows.
-- **Roll Backward**: Implement logic to handle reorganizations, such as clearing unconfirmed transactions or realigning data.
+```csharp
+builder.Services.AddOgmiosServices();
+builder.Services.AddSingleton<IChainSynchronizationMessageHandlers, ChainSynchronizationMessageHandlers>();
 
-### Example Use Cases:
+await chainSynchronizationClientService.ResumeAsync(
+    [chainContext],
+    maxBlocksPerSecond: ogmiosConfiguration.MaxBlocksPerSecond,
+    inFlight: 100,
+    cancellationToken);
+```
 
-1. **Data Persistence**: Save block data to a database for analytics or audits.
-2. **Custom Logic**: Integrate application-specific behavior based on new or reorganized blockchain data.
-
-## Summary
-
-Chain synchronization offers a robust and efficient mechanism for keeping clients aligned with the Cardano blockchain. By leveraging features like intersection finding, rolling forward, rolling backward, and pipelining, clients can achieve reliable and performant synchronization tailored to their needs.
-
-## Example Code
-
-Below is an example implementation of the `ChainSynchronizationMessageHandlers` class:
+### Example handler (fast path)
 
 ```csharp
 public class ChainSynchronizationMessageHandlers : IChainSynchronizationMessageHandlers
 {
-    public async Task RollBackwardHandler(Generated.Ogmios.PointOrOrigin point, Generated.Ogmios.TipOrOrigin tip)
+    private readonly Channel<BlockWork> _work = Channel.CreateBounded<BlockWork>(500);
+
+    public Task RollBackwardHandler(Generated.Ogmios.PointOrOrigin point, Generated.Ogmios.TipOrOrigin tip)
     {
-        // Custom logic for rollback events
-        await Task.CompletedTask;
+        _work.Writer.TryWrite(BlockWork.Rollback(point, tip));
+        return Task.CompletedTask;
     }
 
-    public async Task RollForwardHandler(Block block, string blockType, Generated.Tip tip)
+    public Task RollForwardHandler(Block block, string blockType, Generated.Tip tip)
     {
-        // Custom logic for forward events
-        await Task.CompletedTask;
+        _work.Writer.TryWrite(BlockWork.RollForward(block, blockType, tip));
+        return Task.CompletedTask;
     }
 }
 ```
 
-## Key Points:
+## Summary
 
-- **RollBackwardHandler**: Can be extended to handle rollback events (e.g., saving rollback data or triggering actions).
-- **RollForwardHandler**: Can be extended to handle new blocks and act on the returned blockchain data (e.g., process or store block information).
+Chain synchronization offers a robust and efficient mechanism for keeping clients aligned with the Cardano blockchain. By leveraging pipelining, bounded queues, handler offload, and optional `maxBlocksPerSecond` throttling, clients can achieve reliable and performant synchronization tailored to their needs.
+
+## Key Points
+
+- **RollBackwardHandler**: Handle reorgs; keep synchronous if rollback state must be visible before the next forward.
+- **RollForwardHandler**: Must return quickly; the library already parses blocks from UTF-8 and maintains the pipelined window.
+- **Separate sockets**: Chain sync and mempool require different `InteractionContext` instances.

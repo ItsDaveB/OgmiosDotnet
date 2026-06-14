@@ -107,15 +107,6 @@ namespace Ogmios.Services.ChainSynchronization
             {
                 foreach (var message in messageQueue.GetConsumingEnumerable(cancellationToken))
                 {
-                    try
-                    {
-                        await ProcessBlockMessageAsync(message.Memory).ConfigureAwait(false);
-                    }
-                    finally
-                    {
-                        message.Return();
-                    }
-
                     if (minIntervalBetweenRequests > TimeSpan.Zero)
                     {
                         var elapsed = requestStopwatch.Elapsed;
@@ -125,8 +116,19 @@ namespace Ogmios.Services.ChainSynchronization
                         }
                     }
 
+                    // Replenish the pipeline before handler work so in-flight requests stay high
+                    // even when RollForwardHandler/RollBackwardHandler is slow.
                     await RequestNextBlockAsync(message.Context).ConfigureAwait(false);
                     requestStopwatch.Restart();
+
+                    try
+                    {
+                        await ProcessBlockMessageAsync(message.Memory).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        message.Return();
+                    }
                 }
             }
             catch (OperationCanceledException)

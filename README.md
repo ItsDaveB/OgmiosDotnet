@@ -72,11 +72,20 @@ The `OgmiosWorker` is a background service that demonstrates how **OgmiosDotnetC
 - **Resumes blockchain synchronization**: Starts synchronizing from the last known point in the blockchain.
 - **Continuously listens for updates**: Monitors the Cardano node for real-time updates and processes new blocks as they are received.
 
-### Services Used by OgmiosWorker:
+### Services registered by `AddOgmiosServices()`
 
-- **IInteractionContextFactory**: Responsible for establishing and managing WebSocket connections to the Cardano node.
-- **IChainSynchronizationClientService**: Handles the synchronization of blockchain data, ensuring that the latest blocks and chain state are processed based on the starting point configuration.
-- **IMemoryPoolMonitoringService**: Provides functionality to monitor and read memory pool transaction data.
+- **IInteractionContextFactory**: WebSocket connections to Ogmios (use separate contexts per protocol).
+- **IChainSynchronizationClientService**: Pipelined chain sync; blocks delivered via `IChainSynchronizationMessageHandlers`.
+- **IMemoryPoolMonitoringService**: Low-level mempool RPC methods.
+- **IMemoryPoolMonitoringClientService**: High-throughput acquire → drain → repeat loop with `IMemoryPoolMonitoringMessageHandlers`.
+
+### Performance notes
+
+- Keep `IChainSynchronizationMessageHandlers` and `IMemoryPoolMonitoringMessageHandlers` fast; enqueue heavy work to background workers.
+- Use `IMemoryPoolMonitoringClientService.RunAsync` or `MemoryPoolMonitoringExtensions.MonitorAsync` to drain full snapshots.
+- Do not share one WebSocket between chain sync and mempool monitoring.
+
+See [Chain Synchronization](src/Ogmios.Services/ChainSynchronization/docs/README.md) and [Memory Pool Monitoring](src/Ogmios.Services/MemoryPoolMonitoring/docs/README.md) for details.
 
 ### 4. Saving Data to an In-Memory PostgreSQL Database
 

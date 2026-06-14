@@ -23,6 +23,7 @@ namespace Ogmios.Services.Extensions
             services.AddSingleton<IChainSynchronizationClientService, ChainSynchronizationClientService>();
             services.AddSingleton<IBlockService, BlockService>();
             services.AddSingleton<IMemoryPoolMonitoringService, MemoryPoolMonitoringService>();
+            services.AddSingleton<IMemoryPoolMonitoringClientService, MemoryPoolMonitoringClientService>();
             services.AddSingleton<ITransactionSubmissionService, TransactionSubmissionService>();
             services.AddSingleton<ITransactionEvaluationService, TransactionEvaluationService>();
 
